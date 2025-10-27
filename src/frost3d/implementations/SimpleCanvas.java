@@ -1,0 +1,153 @@
+package frost3d.implementations;
+
+import java.util.Stack;
+
+import org.joml.Matrix4f;
+import org.joml.Vector4f;
+
+import frost3d.Framebuffer;
+import frost3d.GLState;
+import frost3d.RenderQueue;
+import frost3d.Shaders;
+import frost3d.Shapes;
+import frost3d.interfaces.F3DCanvas;
+import frost3d.interfaces.F3DTextRenderer;
+import frost3d.interfaces.GLMesh;
+import frost3d.interfaces.GLTexture;
+import frost3d.utility.Rectangle;
+
+public class SimpleCanvas implements F3DCanvas {
+	//turn this into generic canvas and make gui use ICanvas an interface
+	
+		// -- ++ (  effectively final state,  ) ++ -- //
+
+		private RenderQueue renderqueue = new RenderQueue();
+		
+		// -- ++ ( infrequently changed state ) ++ -- //
+		
+		F3DTextRenderer textrenderer;
+		
+		Framebuffer framebuffer = null;
+		int width 			= -1;
+		int height 			= -1;
+		public int width() { return width; }
+		public int height() { return height; }
+
+		private Rectangle current_scissor;
+		
+		public void textrenderer(F3DTextRenderer v) { this.textrenderer = v; }
+		public F3DTextRenderer textrenderer() { return this.textrenderer; }
+		
+		public void framebuffer	(Framebuffer v) { this.framebuffer 	= v; }
+		public Framebuffer framebuffer	() { return this.framebuffer; }
+
+		public void size		(int w, int h) { 
+			this.width = w;
+			this.height = h;
+			gui_bounds = new Rectangle(0, 0, width, height);
+			world_transform(new Matrix4f().ortho(0, width, height, 0, -1024f, 1024f));
+			}
+		
+		Rectangle gui_bounds = new Rectangle(0, 0, width, height);
+		public Rectangle size() { return gui_bounds; }
+		
+		// -- ++ (  frequently changed state  ) ++ -- //
+
+		static Stack<Rectangle> scissor_stack = new Stack<Rectangle>();
+		
+		/** Saves the current scissor and then sets the new scissor to this. */
+		public void push_scissor(Rectangle box) {
+			scissor_stack.push(current_scissor);
+			current_scissor = box;
+		}
+		
+		/** Reverts to the previous scissor box. */
+		public void pop_scissor() {
+			current_scissor = scissor_stack.pop();
+		}
+		
+		public Rectangle scissor() {
+			if (current_scissor == null) return new Rectangle(0, 0, width, height);
+			return current_scissor;
+		}
+		
+		public void push_scissor(int left, int top, int right, int bottom) {
+			push_scissor(new Rectangle(left, top, right, bottom));
+		}
+		
+		Vector4f color = new Vector4f();
+		Vector4f clear_color = new Vector4f(1,1,1,1);
+		
+		Matrix4f world_transform;
+
+		public void color(Vector4f color) { this.color = color; }
+
+		public void world_transform(Matrix4f mat) {
+			world_transform = mat;
+		}
+		
+		// -- **  ** -- //
+
+		public void draw_frame() {
+			
+			// clear the framebuffer
+			if (framebuffer != null) framebuffer.bind();
+			GLState.clearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+			GLState.clear();
+			
+			renderqueue.render();
+						
+		}
+		
+		// -- ** Drawing API ** -- //
+		
+		public void rect(Rectangle bounds, int depth) {
+			Shapes.rect(this, bounds.left(), bounds.top(), bounds.right(), bounds.bottom(), depth);
+		}
+
+		public void rect(int left, int top, int right, int bottom, int depth) {
+			Shapes.rect(this, left, top, right, bottom, depth);
+		}
+		
+		public void rect(int left, int top, int right, int bottom, int depth, GLTexture texture) {
+			Shapes.rect(this, left, top, right, bottom, depth, texture);
+		}
+		
+		public void text(int x, int y, int depth, String text) {
+			textrenderer.text(this, x, y, depth, text);
+		}
+		
+		@Override
+		public void queue(GLMesh mesh, Matrix4f transform, GLTexture texture) {
+			// default
+			renderqueue.mix_color(color);
+			
+			// specific
+			renderqueue.mesh(mesh);
+			renderqueue.transform(transform);
+			renderqueue.world_transform(world_transform);
+			renderqueue.texture(texture);
+			renderqueue.shader(Shaders.MONOCOLORED_TEXTURED_UNSHADED);
+			renderqueue.queue();
+		}
+		
+		@Override
+		public void queue(GLMesh mesh, Matrix4f transform, Matrix4f world_transform, String shader, GLTexture texture) {
+			// default
+			renderqueue.mix_color(color);
+			
+			// specific
+			renderqueue.mesh(mesh);
+			renderqueue.transform(transform);
+			renderqueue.world_transform(world_transform);
+			renderqueue.texture(texture);
+			renderqueue.shader(shader);
+			renderqueue.queue();
+		}
+
+		@Override
+		public void clear_color(float r, float g, float b, float a) {
+			clear_color = new Vector4f(r,g,b,a);
+		}
+
+}
