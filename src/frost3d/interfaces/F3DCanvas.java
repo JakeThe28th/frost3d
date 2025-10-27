@@ -1,7 +1,6 @@
 package frost3d.interfaces;
 
 import org.joml.Matrix4f;
-import org.joml.Vector3fc;
 import org.joml.Vector4f;
 
 import frost3d.Framebuffer;

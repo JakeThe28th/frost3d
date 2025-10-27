@@ -4,7 +4,6 @@ import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
 
 import org.joml.Matrix4f;
 import org.joml.Vector2d;
-import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.lwjgl.opengl.GL40;
 

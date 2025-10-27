@@ -1,17 +1,8 @@
 package frost3d.averificare;
 
-import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
-import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
-
 import java.io.IOException;
-import java.text.ParseException;
-
-import org.joml.Matrix4f;
-import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.joml.Vector4f;
-import org.lwjgl.opengl.GL40;
-
 import frost3d.Framebuffer;
 import frost3d.GLState;
 import frost3d.Shaders;

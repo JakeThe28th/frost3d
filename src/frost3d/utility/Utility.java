@@ -5,7 +5,6 @@ import java.io.StringWriter;
 import java.util.HashMap;
 
 import org.joml.Vector2d;
-import org.joml.Vector2i;
 import org.joml.Vector4f;
 
 import frost3d.enums.Alignment;
