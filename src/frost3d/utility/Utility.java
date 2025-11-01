@@ -2,6 +2,7 @@ package frost3d.utility;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.joml.Vector2d;
@@ -265,6 +266,36 @@ public class Utility {
 		if (val < min) val = min;
 		if (val > max) val = max;
 		return val;
+	}
+	
+	
+	public static float[] trim(float[] arr, int cout) {
+		float[] neww = new float[cout];
+		for (int i = 0; i < cout; i++) {
+			neww[i] = arr[i];
+		}
+		return neww;
+	}
+	public static int[] trim(int[] arr, int cout) {
+		int[] neww = new int[cout];
+		for (int i = 0; i < cout; i++) {
+			neww[i] = arr[i];
+		}
+		return neww;
+	}
+	
+	public static void ensureSize(ArrayList<?> list, int size) {
+	    list.ensureCapacity(size);
+	    while (list.size() < size) {
+	        list.add(null);
+	    }
+	}
+
+	public static void _assert(boolean b, String string) {
+		if (b == false) {
+			Log.send(string);
+			throw new Error("Failed assumption");
+		}
 	}
 
 	
