@@ -6,10 +6,11 @@ import org.joml.Matrix4f;
 import org.joml.Vector4f;
 
 import frost3d.Framebuffer;
+import frost3d.GLShaderProgram;
 import frost3d.GLState;
 import frost3d.RenderQueue;
-import frost3d.Shaders;
 import frost3d.Shapes;
+import frost3d.data.BuiltinShaders;
 import frost3d.interfaces.F3DCanvas;
 import frost3d.interfaces.F3DTextRenderer;
 import frost3d.interfaces.GLMesh;
@@ -34,6 +35,7 @@ public class SimpleCanvas implements F3DCanvas {
 		public int height() { return height; }
 
 		private Rectangle current_scissor;
+		private GLShaderProgram current_shader = BuiltinShaders.MONOCOLORED_TEXTURED_UNSHADED;
 		
 		public void textrenderer(F3DTextRenderer v) { this.textrenderer = v; }
 		public F3DTextRenderer textrenderer() { return this.textrenderer; }
@@ -118,21 +120,18 @@ public class SimpleCanvas implements F3DCanvas {
 		}
 		
 		@Override
-		public void queue(GLMesh mesh, Matrix4f transform, GLTexture texture) {
-			// default
-			renderqueue.mix_color(color);
-			
-			// specific
-			renderqueue.mesh(mesh);
-			renderqueue.transform(transform);
-			renderqueue.world_transform(world_transform);
-			renderqueue.texture(texture);
-			renderqueue.shader(Shaders.MONOCOLORED_TEXTURED_UNSHADED);
-			renderqueue.queue();
+		public void queue(GLMesh mesh, Matrix4f transform, GLTexture... textures) {
+			queue(mesh, transform, world_transform, current_shader, textures);
 		}
 		
 		@Override
-		public void queue(GLMesh mesh, Matrix4f transform, Matrix4f world_transform, String shader, GLTexture texture) {
+		public void queue(GLMesh mesh, Matrix4f transform, GLShaderProgram shader, GLTexture... textures) {
+			queue(mesh, transform, world_transform, shader, textures);
+		}
+
+		
+		@Override
+		public void queue(GLMesh mesh, Matrix4f transform, Matrix4f world_transform, GLShaderProgram shader, GLTexture... textures) {
 			// default
 			renderqueue.mix_color(color);
 			
@@ -140,7 +139,7 @@ public class SimpleCanvas implements F3DCanvas {
 			renderqueue.mesh(mesh);
 			renderqueue.transform(transform);
 			renderqueue.world_transform(world_transform);
-			renderqueue.texture(texture);
+			renderqueue.textures(textures);
 			renderqueue.shader(shader);
 			renderqueue.queue();
 		}

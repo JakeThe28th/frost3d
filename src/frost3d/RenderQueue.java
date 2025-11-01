@@ -1,10 +1,18 @@
 package frost3d;
 
+import static org.lwjgl.opengl.GL11.GL_NEAREST;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_MAG_FILTER;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_MIN_FILTER;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
 import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE1;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE2;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE3;
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -12,9 +20,12 @@ import org.joml.Matrix4f;
 import org.joml.Vector4f;
 import org.lwjgl.opengl.GL40;
 
+import frost3d.data.BuiltinShaders;
+import frost3d.implementations.SimpleTexture;
 import frost3d.interfaces.GLMesh;
 import frost3d.interfaces.GLTexture;
 import frost3d.utility.LimitedStack;
+import frost3d.utility.Log;
 import frost3d.utility.Rectangle;
 
 public class RenderQueue {
@@ -26,8 +37,8 @@ public class RenderQueue {
 	HashMap			<String, Matrix4f> 	matuniforms 	= new HashMap<>(); // ex : transform, world
 	LimitedStack	<Rectangle>  		scissors 		= new LimitedStack<>();
 	GLMesh 					 			mesh 			= null;
-	GLTexture							texture			= null;
-	String 								shader			= Shaders.CORE;
+	GLTexture[]							textures		= null;
+	GLShaderProgram 					shader			= BuiltinShaders.CORE;
 	
 	{ scissors.push(null); }
 	
@@ -46,10 +57,10 @@ public class RenderQueue {
 		matuniforms.put(name, v);
 	}
 	
-	public LimitedStack<Rectangle> 	scissors() 		{ return scissors  ; }
-	public void 				 	mesh(GLMesh m) 	{ mesh 			= m; }
-	public void 					texture(GLTexture t) { texture 		= t; }
-	public void						shader(String shader) { this.shader = shader; }
+	public LimitedStack<Rectangle> 	scissors() 					{ return scissors  ; }
+	public void 				 	mesh(GLMesh m) 				{ mesh 			= m; }
+	public void 					textures(GLTexture... t) 	{ textures 		= t; }
+	public void						shader(GLShaderProgram shader) { this.shader = shader; }
 	
 	public void mix_color(Vector4f color) {
 		uniform("mix_color", color);
@@ -68,48 +79,49 @@ public class RenderQueue {
 			HashMap<String, Integer> 	intuniforms,
 			HashMap<String, Vector4f> 	vecuniforms,
 			HashMap<String, Matrix4f> 	matuniforms,
-			Rectangle 	scissor,
-			GLMesh 		mesh,
-			GLTexture 	texture,
-			String		shader
+			Rectangle 		scissor,
+			GLMesh 			mesh,
+			GLTexture[] 	textures,
+			GLShaderProgram	shader
 			) { }
 	
 	ArrayList<RenderState> queue = new ArrayList<RenderState>();
 	
 	public void queue() {
-		queue.add(new RenderState(intuniforms, vecuniforms, matuniforms, scissors.peek(), mesh, texture, shader));
+		if (shader == null) throw new Error("Default shader is null. Did a RenderQueue method get called before BuiltinShaders.init()?");
+		queue.add(new RenderState(intuniforms, vecuniforms, matuniforms, scissors.peek(), mesh, textures, shader));
 	}
 	
 	// -- ++ (  actual rendering  ) ++ -- //
 	
 	GLMesh last_mesh = null;
-	GLTexture last_texture = null;
+	GLTexture[] last_textures = null;
 	Rectangle last_scissor = null;
-	String last_shader = null;
+	GLShaderProgram last_shader = null;
 	
 	public void render() {
 		last_mesh = null;
-		last_texture = null;
+		last_textures = new GLTexture[4];
 		last_scissor = null;
 		last_shader = null;
 		
 		for (RenderState state : queue) {
 
 			if (last_shader == null || !last_shader.equals(state.shader)) {
-				Shaders.bind(state.shader);
+				state.shader.bind();
 				last_shader = state.shader;
 			}
 			
 			for (String uniform : state.intuniforms.keySet()) {
-				Shaders.uniform(uniform, state.intuniforms.get(uniform));
+				GLShaderProgram.uniform(uniform, state.intuniforms.get(uniform));
 			}
 			
 			for (String uniform : state.vecuniforms.keySet()) {
-				Shaders.uniform(uniform, state.vecuniforms.get(uniform));
+				GLShaderProgram.uniform(uniform, state.vecuniforms.get(uniform));
 			}
 			
 			for (String uniform : state.matuniforms.keySet()) {
-				Shaders.uniform(uniform, state.matuniforms.get(uniform));
+				GLShaderProgram.uniform(uniform, state.matuniforms.get(uniform));
 			}
 			
 			// .. //
@@ -119,9 +131,26 @@ public class RenderQueue {
 				last_mesh = state.mesh;
 			}
 			
-			if (last_texture != state.texture) {
-				if (state.texture != null) glBindTexture(GL_TEXTURE_2D, state.texture.gltexture());
-				last_texture = state.texture;
+//			if (last_texture != state.texture) {
+//				if (state.texture != null) glBindTexture(GL_TEXTURE_2D, state.texture.gltexture());
+//				last_texture = state.texture;
+//			}
+			
+			// Textures
+			int[] slots = { GL_TEXTURE0, GL_TEXTURE1, GL_TEXTURE2, GL_TEXTURE3};
+			if (state.textures != null)
+			for (int i = 0; i < state.textures.length; i++) {
+				if (i >= 4) Log.send("Attempted to have more than 4 textures");
+				
+				if (last_textures[i] != state.textures[i]) {
+					if (state.textures[i] != null)  {
+						bindTexture(slots[i], state.textures[i]);
+					} else {
+						bindTexture(slots[i], MISSING_TEXTURE);
+					}
+				}
+				
+				last_textures[i] = state.textures[i];
 			}
 			
 			if (last_scissor != state.scissor) {
@@ -150,4 +179,24 @@ public class RenderQueue {
 		queue.clear();
 	}
 
+	// -- TODO: probably move these somewhere else-- //
+	
+	// https://youtu.be/q69-VhhSY3I
+	public static SimpleTexture MISSING_TEXTURE;
+	static {
+		BufferedImage img = new BufferedImage(2,2,BufferedImage.TYPE_INT_ARGB);
+			img.setRGB(0, 0, 0xFFFF00FF);
+			img.setRGB(1, 0, 0xFF000000);
+			img.setRGB(0, 1, 0xFF000000);
+			img.setRGB(1, 1, 0xFFFF00FF);
+		MISSING_TEXTURE = new SimpleTexture(img);
+			MISSING_TEXTURE.bind();
+			GL40.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			GL40.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	}
+
+	private static void bindTexture(int slot, GLTexture texture) {
+		GL40.glActiveTexture(slot);
+		glBindTexture(GL_TEXTURE_2D, texture.gltexture());
+	}
 }

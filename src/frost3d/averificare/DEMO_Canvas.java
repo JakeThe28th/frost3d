@@ -5,8 +5,8 @@ import org.joml.Vector2i;
 import org.joml.Vector4f;
 import frost3d.Framebuffer;
 import frost3d.GLState;
-import frost3d.Shaders;
 import frost3d.conveniences.Icons;
+import frost3d.data.BuiltinShaders;
 import frost3d.enums.Alignment;
 import frost3d.enums.FillMode;
 import frost3d.interfaces.*;
@@ -23,21 +23,20 @@ public class DEMO_Canvas {
 	
 		GLState.initializeGLFW();
 		
+		// Create window ...
+		SimpleWindow window = new SimpleWindow(300, 600, "Canvas Rendering Tests") {
+			@Override public void onWindowResize() {
+				//canvas.size(width()/2, height()/2);
+			}
+		};
+		
+		// Create core shaders (needs to be done after window cuz context)
+		BuiltinShaders.init();
+		
 		SimplePositionedCanvas canvas = new SimplePositionedCanvas();
 		
 			canvas.size(180, 120);
-		
-			// Create window ...
-			SimpleWindow window = new SimpleWindow(300, 600, "Canvas Rendering Tests") {
-				@Override public void onWindowResize() {
-					//canvas.size(width()/2, height()/2);
-				}
-			};
-			
-			// Create core shaders (needs to be done after window cuz context)
-			Shaders.init();
-			Shaders.bind("gui");
-			
+
 			// The canvas will render directly to the window.
 			// So, after calling draw_frame(), all that's
 			// necessary is glfwSwapBuffers().
@@ -73,7 +72,6 @@ public class DEMO_Canvas {
 			//xx = window.input().mouseX();
 			canvas.outrectangle(window.width, window.height);
 			xx = canvas.internalpoint(new Vector2i(window.input().mouseX(),0)).x;
-			Shaders.bind("gui");
 			
 			// Rendering Tests //
 				canvas.color(new Vector4f(1,1,1,1));

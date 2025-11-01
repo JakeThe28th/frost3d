@@ -8,7 +8,7 @@ import org.joml.Vector2i;
 import org.lwjgl.opengl.GL40;
 
 import frost3d.GLState;
-import frost3d.Shaders;
+import frost3d.data.BuiltinShaders;
 import frost3d.enums.Alignment;
 import frost3d.enums.FillMode;
 import frost3d.interfaces.F3DCanvas;
@@ -53,14 +53,14 @@ public class SimplePositionedCanvas extends SimpleCanvas implements F3DPositione
 
 	@Override
 	public void draw(F3DCanvas canvas) {
-		canvas.queue(mesh(), new Matrix4f(), new Matrix4f().ortho(-1, 1, -1, 1, -1, 1), Shaders.SCREEN, framebuffer().texture());
+		canvas.queue(mesh(), new Matrix4f(), new Matrix4f().ortho(-1, 1, -1, 1, -1, 1), BuiltinShaders.SCREEN, framebuffer().texture());
 	}
 
 	@Override
 	public void draw(F3DWindow window) {
 		window.bind();
 		GLState.clear();
-		Shaders.bind("screen");				
+		BuiltinShaders.SCREEN.bind();		
 		mesh().bind();
 		GL40.glActiveTexture(GL40.GL_TEXTURE0);									// Activate texture0
 		GL40.glBindTexture(GL40.GL_TEXTURE_2D,  framebuffer().texture().gltexture());	// Bind the texture t to texture0

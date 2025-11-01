@@ -4,6 +4,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector4f;
 
 import frost3d.Framebuffer;
+import frost3d.GLShaderProgram;
 import frost3d.utility.Rectangle;
 
 public interface F3DCanvas {
@@ -44,8 +45,9 @@ public interface F3DCanvas {
 	 *  and renders them to the framebuffer. */
 	public void draw_frame();
 
-	public void queue(GLMesh mesh, Matrix4f transform, GLTexture texture);
-	public void queue(GLMesh mesh, Matrix4f transform, Matrix4f world_transform, String shader, GLTexture texture);
+	public void queue(GLMesh mesh, Matrix4f transform, GLTexture... textures);
+	public void queue(GLMesh mesh, Matrix4f transform, GLShaderProgram shader, GLTexture... textures);
+	public void queue(GLMesh mesh, Matrix4f transform, Matrix4f world_transform, GLShaderProgram shader, GLTexture... textures);
 
 	public int width();
 	public int height();
