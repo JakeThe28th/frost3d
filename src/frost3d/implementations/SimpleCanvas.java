@@ -50,6 +50,11 @@ public class SimpleCanvas implements F3DCanvas {
 			world_transform(new Matrix4f().ortho(0, width, height, 0, -1024f, 1024f));
 			}
 		
+		public void adopt(Framebuffer framebuffer) {
+			size(framebuffer.width(), framebuffer.height());
+			framebuffer(framebuffer);
+		}
+		
 		Rectangle gui_bounds = new Rectangle(0, 0, width, height);
 		public Rectangle size() { return gui_bounds; }
 		
