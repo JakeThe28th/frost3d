@@ -1,5 +1,6 @@
 package frost3d.utility;
 
+import java.awt.image.BufferedImage;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -295,6 +296,43 @@ public class Utility {
 		if (b == false) {
 			Log.send(string);
 			throw new Error("Failed assumption");
+		}
+	}
+
+	public static Rectangle getBoundingBoxOfImage(BufferedImage data) {
+		int min_x = -1;
+		int max_x = -1;
+		int min_y = -1;
+		int max_y = -1;
+		
+		// Get topmost height
+		find: for (int y = 0; y < data.getHeight(); y++)
+		for (int x = 0; x < data.getWidth(); x++) {
+			if ((data.getRGB(x, y) & 0xFF000000) != 0) { min_y = y; break find; }
+		}
+
+		// Get leftmost x
+		find: for (int x = 0; x < data.getWidth(); x++)
+		for (int y = min_y; y < data.getHeight(); y++) {
+			if ((data.getRGB(x, y) & 0xFF000000) != 0) { min_x = x; break find; }
+		}
+
+		// Get rightmost x
+		find: for (int x = data.getWidth()-1; x >= min_x; x--)
+		for (int y = min_y; y < data.getHeight(); y++) {
+			if ((data.getRGB(x, y) & 0xFF000000) != 0) { max_x = x; break find; }
+		}
+
+		// Get lowest height
+		find: for (int y = data.getHeight()-1; y >= 0; y--)
+		for (int x = min_x; x < data.getWidth(); x++) {
+			if ((data.getRGB(x, y) & 0xFF000000) != 0) { max_y = y; break find; }
+		}
+		
+		if (min_x == -1 || max_x == -1 || min_y == -1 || max_y == -1) {
+			return null;
+		} else {
+			return new Rectangle(min_x, min_y, max_x+1, max_y+1);
 		}
 	}
 
