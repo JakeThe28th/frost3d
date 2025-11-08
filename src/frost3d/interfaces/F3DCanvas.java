@@ -33,6 +33,8 @@ public interface F3DCanvas {
 	
 	// -- ++ DRAWING ++ -- //
 	
+	public void rect(Rectangle rect, int depth);
+	
 	public void rect(int left, int top, int right, int bottom, int depth);
 	
 	public void rect(int left, int top, int right, int bottom, int depth, GLTexture texture);
