@@ -10,10 +10,25 @@ import org.lwjgl.glfw.GLFW;
 
 public class Input {
 	
+	private void has_input_this_frame() {
+		// To properly detect when single-frame inputs
+		// (like 'pressed' or 'released') end, input
+		// needs to be checked two frames in a row
+		has_input_this_frame = true;
+		has_input_next_frame = true;
+	}
+	
 	boolean has_input_this_frame = false;
-
+	boolean has_input_next_frame = false;
+	
 	public void clearKeys() {
+		
 		has_input_this_frame = false;
+		if (has_input_next_frame && !has_input_this_frame) {
+			has_input_next_frame = false;
+			has_input_this_frame = true;
+		}
+		
 		// Events
 		current_keys = new Key[1024];
 		current_mouse_buttons = new MouseButton[8];
@@ -39,7 +54,7 @@ public class Input {
 		
 		// Setup a key callback. It will be called every time a key is pressed, repeated or released.
 		glfwSetKeyCallback(current_window, (_, key, scancode, action, mods) -> {
-			has_input_this_frame = true;
+			has_input_this_frame();
 			setKeyWithScancode(key, scancode, action, mods);
 			last_key = new Key(key, scancode, action, mods);
 			
@@ -57,12 +72,12 @@ public class Input {
 		});
 		
 		glfwSetCursorPosCallback(current_window, (_, xpos, ypos) -> {
-			has_input_this_frame = true;
+			has_input_this_frame();
 			setMousePos(xpos, ypos);
 		});
 		
 		glfwSetMouseButtonCallback(current_window, (_, button, action, mods) -> {
-			has_input_this_frame = true;
+			has_input_this_frame();
 			setMouseButton(button, action, mods);
 			
 			if (action == GLFW.GLFW_PRESS) setMouseButtonDown(button, true);
@@ -70,17 +85,17 @@ public class Input {
 		});
 		
 		glfwSetScrollCallback(current_window, (_, xoffset, yoffset) -> {
-			has_input_this_frame = true;
+			has_input_this_frame();
 			setMouseScroll(xoffset, yoffset);
 		});
 
 		glfwSetCharCallback(current_window, (_, codepoint) -> {
-			has_input_this_frame = true;
+			has_input_this_frame();
 			input_string += (char) codepoint;
 		});
 		
 		GLFW.glfwSetWindowIconifyCallback(current_window, (_, iconified) -> {
-			has_input_this_frame = true;
+			has_input_this_frame();
 			is_iconified = iconified;
 		});
 	}
