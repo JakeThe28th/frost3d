@@ -202,4 +202,6 @@ public class RenderQueue {
 		GL40.glActiveTexture(slot);
 		glBindTexture(GL_TEXTURE_2D, texture.gltexture());
 	}
+
+	public int size() { return queue.size(); }
 }
