@@ -41,10 +41,14 @@ public class RenderQueue {
 	GLShaderProgram 					shader			= BuiltinShaders.CORE;
 	
 	{ scissors.push(null); }
+	
 	{
 		 // intuniforms.put("texture0", 0); // TODO for texture slots
 	}
 	
+	public void push_scissor(Rectangle box) { scissors.push(box); }
+	public void pop_scissor(Rectangle box) { scissors.pop(); }
+
 	public void uniform(String name, int v) {
 		intuniforms = new HashMap<String, Integer>(intuniforms);
 		intuniforms.put(name, v);

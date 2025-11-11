@@ -1,5 +1,6 @@
 package frost3d.utility;
 
+import org.joml.Vector2f;
 import org.joml.Vector2i;
 
 public record Rectangle(int left, int top, int right, int bottom) {
@@ -44,6 +45,10 @@ public record Rectangle(int left, int top, int right, int bottom) {
 				(int) (left + (width() * rp)), 
 				(int) (top + (height() * bp)));
 	}
+	
+	public Rectangle internal_int(int lp, int tp, int rp, int bp) {
+		return new Rectangle(left + lp, top + tp, left + rp, top + bp);
+	}
 
 	public Rectangle constrain_to(Rectangle other) {
 		int left 	= this.left;
@@ -66,6 +71,14 @@ public record Rectangle(int left, int top, int right, int bottom) {
 
 	public Rectangle offset(int offset_x, int offset_y) {
 		return new Rectangle(left + offset_x, top + offset_y, right + offset_x, bottom + offset_y);
-	} 
-	
+	}
+
+	public Vector2f normalized(float x, float y) {
+		y -= top;
+		x -= left;
+		y /= (float) height();
+		x /= (float) width();
+		return new Vector2f(x, y);
+	}
+
 }

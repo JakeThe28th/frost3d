@@ -1,7 +1,5 @@
 package frost3d.implementations;
 
-import java.util.Stack;
-
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 
@@ -34,7 +32,6 @@ public class SimpleCanvas implements F3DCanvas {
 		public int width() { return width; }
 		public int height() { return height; }
 
-		private Rectangle current_scissor;
 		private GLShaderProgram current_shader = BuiltinShaders.MONOCOLORED_TEXTURED_UNSHADED;
 		
 		public void textrenderer(F3DTextRenderer v) { this.textrenderer = v; }
@@ -59,23 +56,18 @@ public class SimpleCanvas implements F3DCanvas {
 		public Rectangle size() { return gui_bounds; }
 		
 		// -- ++ (  frequently changed state  ) ++ -- //
-
-		static Stack<Rectangle> scissor_stack = new Stack<Rectangle>();
 		
 		/** Saves the current scissor and then sets the new scissor to this. */
 		public void push_scissor(Rectangle box) {
-			scissor_stack.push(current_scissor);
-			current_scissor = box;
+			renderqueue.push_scissor(new Rectangle(
+					box.left(), height-box.bottom(), 
+					box.right(), height-box.top()));
 		}
 		
 		/** Reverts to the previous scissor box. */
 		public void pop_scissor() {
-			current_scissor = scissor_stack.pop();
-		}
-		
-		public Rectangle scissor() {
-			if (current_scissor == null) return new Rectangle(0, 0, width, height);
-			return current_scissor;
+			renderqueue.pop_scissor(gui_bounds);
+
 		}
 		
 		public void push_scissor(int left, int top, int right, int bottom) {
