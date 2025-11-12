@@ -36,6 +36,8 @@ public class SimpleTextRenderer implements F3DTextRenderer {
 	Font font = new Font("Consolas", Font.PLAIN, font_size);
 	
 	public void font_size(int new_size) {
+		if (font_size == new_size) return;
+		
 		this.font_size = new_size;
 		font = new Font("Consolas", Font.PLAIN, font_size);
 	}

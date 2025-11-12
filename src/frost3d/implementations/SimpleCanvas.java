@@ -1,6 +1,7 @@
 package frost3d.implementations;
 
 import org.joml.Matrix4f;
+import org.joml.Vector2i;
 import org.joml.Vector4f;
 
 import frost3d.Framebuffer;
@@ -116,6 +117,11 @@ public class SimpleCanvas implements F3DCanvas {
 		
 		public void rect(int left, int top, int right, int bottom, int depth, GLTexture texture) {
 			Shapes.rect(this, left, top, right, bottom, depth, texture);
+		}
+		
+
+		public void dot(int x, int y, int depth, int radius) {
+			Shapes.dot(this, x, y, depth, radius);
 		}
 		
 		public void text(int x, int y, int depth, String text) {

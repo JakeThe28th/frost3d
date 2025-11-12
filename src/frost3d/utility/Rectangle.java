@@ -81,4 +81,11 @@ public record Rectangle(int left, int top, int right, int bottom) {
 		return new Vector2f(x, y);
 	}
 
+	public Vector2i center() {
+		return new Vector2i(
+				(left + right) / 2,
+				(top + bottom) / 2
+			);
+	}
+
 }
