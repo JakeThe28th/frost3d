@@ -11,6 +11,9 @@ public interface F3DCanvas {
 	
 	public void textrenderer(F3DTextRenderer v);
 	public F3DTextRenderer textrenderer();
+	
+	public void iconrenderer(F3DIconRenderer v);
+	public F3DIconRenderer iconrenderer();
 
 	public void framebuffer	(Framebuffer f);
 	public void size		(int w, int h);

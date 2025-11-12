@@ -9,7 +9,9 @@ import frost3d.GLState;
 import frost3d.RenderQueue;
 import frost3d.Shapes;
 import frost3d.data.BuiltinShaders;
+import frost3d.enums.IconType;
 import frost3d.interfaces.F3DCanvas;
+import frost3d.interfaces.F3DIconRenderer;
 import frost3d.interfaces.F3DTextRenderer;
 import frost3d.interfaces.GLMesh;
 import frost3d.interfaces.GLTexture;
@@ -25,6 +27,7 @@ public class SimpleCanvas implements F3DCanvas {
 		// -- ++ ( infrequently changed state ) ++ -- //
 		
 		F3DTextRenderer textrenderer;
+		F3DIconRenderer iconrenderer;
 		
 		Framebuffer framebuffer = null;
 		int width 			= -1;
@@ -36,6 +39,9 @@ public class SimpleCanvas implements F3DCanvas {
 		
 		public void textrenderer(F3DTextRenderer v) { this.textrenderer = v; }
 		public F3DTextRenderer textrenderer() { return this.textrenderer; }
+		
+		public void iconrenderer(F3DIconRenderer v) { this.iconrenderer = v; }
+		public F3DIconRenderer iconrenderer() { return this.iconrenderer; }
 		
 		public void framebuffer	(Framebuffer v) { this.framebuffer 	= v; }
 		public Framebuffer framebuffer	() { return this.framebuffer; }
@@ -114,6 +120,10 @@ public class SimpleCanvas implements F3DCanvas {
 		
 		public void text(int x, int y, int depth, String text) {
 			textrenderer.text(this, x, y, depth, text);
+		}
+		
+		public void icon(int x, int y, int depth, IconType icon) {
+			iconrenderer.icon(this, x, y, depth, icon);
 		}
 		
 		@Override

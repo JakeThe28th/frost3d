@@ -1,4 +1,4 @@
-package frost3d.conveniences;
+package frost3d.implementations;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -10,17 +10,15 @@ import org.joml.Matrix4f;
 
 import frost3d.Shapes;
 import frost3d.enums.IconType;
-import frost3d.implementations.SimpleMesh;
 import frost3d.interfaces.F3DCanvas;
+import frost3d.interfaces.F3DIconRenderer;
 import frost3d.utility.Log;
 
-public class VectorIcons {
-	
-	// Load the vector icons at startup
-	
-	static HashMap<String, SimpleMesh> icons = new HashMap<String, SimpleMesh>();
+public class VectorIconRenderer implements F3DIconRenderer {
 		
-	static {
+	HashMap<String, SimpleMesh> icons = new HashMap<String, SimpleMesh>();
+		
+	public VectorIconRenderer() {
 		
 		String icons_file = "";
 		
@@ -122,11 +120,20 @@ public class VectorIcons {
 
 	// Drawing //
 	
-	public static void icon(F3DCanvas canvas, int x, int y, int z, IconType icon, int size) {
-		VectorIcons.icon(canvas, x, y, z, icon.vector, size);
+	private int 	size	= 16;
+	
+	public void size(int s) { this.size = s; }
+	public int size() { return size; }
+	
+	public void icon(F3DCanvas canvas, int x, int y, int z, IconType icon) {
+		icon(canvas, x, y, z, icon.vector, size);
 	}
 	
-	static void icon(F3DCanvas canvas, int x, int y, int z, String name, int size) {
+	public void icon(F3DCanvas canvas, int x, int y, int z, IconType icon, int size) {
+		icon(canvas, x, y, z, icon.vector, size);
+	}
+	
+	void icon(F3DCanvas canvas, int x, int y, int z, String name, int size) {
 		if (icons.get(name) == null) throw new Error("No such icon: " + name);
 		
 		float scale = size;

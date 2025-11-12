@@ -5,8 +5,6 @@ import org.joml.Vector2i;
 import org.joml.Vector4f;
 import frost3d.Framebuffer;
 import frost3d.GLState;
-import frost3d.conveniences.BitmapIcons;
-import frost3d.conveniences.VectorIcons;
 import frost3d.data.BuiltinShaders;
 import frost3d.enums.Alignment;
 import frost3d.enums.FillMode;
@@ -26,7 +24,7 @@ public class DEMO_Canvas {
 		GLState.initializeGLFW();
 		
 		// Create window ...
-		SimpleWindow window = new SimpleWindow(300, 600, "Canvas Rendering Tests") {
+		SimpleWindow window = new SimpleWindow(600, 800, "Canvas Rendering Tests") {
 			@Override public void onWindowResize() {
 				//canvas.size(width()/2, height()/2);
 			}
@@ -37,13 +35,13 @@ public class DEMO_Canvas {
 		
 		SimplePositionedCanvas canvas = new SimplePositionedCanvas();
 		
-			canvas.size(180, 120);
+			canvas.size(280, 220);
 
 			// The canvas will render directly to the window.
 			// So, after calling draw_frame(), all that's
 			// necessary is glfwSwapBuffers().
 			canvas.framebuffer(null);
-			Framebuffer frame = new Framebuffer(180,120);
+			Framebuffer frame = new Framebuffer(280,220);
 			canvas.framebuffer(frame);
 			
 			// Set the text renderer ...
@@ -51,6 +49,14 @@ public class DEMO_Canvas {
 			text.anti_aliasing_enabled(true);
 			canvas.textrenderer(text);
 			
+			VectorIconRenderer vector_icons = new VectorIconRenderer();
+				vector_icons.size(40);
+			BitmapIconRenderer bitmap_icons = new BitmapIconRenderer();
+				bitmap_icons.size(40);
+				bitmap_icons.centered_scale(1.5f);
+				
+			canvas.iconrenderer(vector_icons);
+
 			canvas.halign(Alignment.MIDDLE);
 			canvas.valign(Alignment.MIDDLE);
 			canvas.fillmode(FillMode.CONTAIN);
@@ -92,8 +98,11 @@ public class DEMO_Canvas {
 				canvas.rect(70, 70, 170, 170, 4, khronos);
 				
 				canvas.color(new Vector4f(1,1,0.5f,1));
-				VectorIcons.icon(canvas, xx, 60, 5, IconType.GENERIC_HOME, 30);
-				BitmapIcons.icon(canvas, xx+30, 60, 5, IconType.GENERIC_HOME, 30, 1.5f);
+				
+				
+				canvas.icon(xx, 60, 5, IconType.CONTROL_PIN);
+				vector_icons.icon(canvas, xx+30, 60, 5, IconType.GENERIC_HOME, 30);
+				bitmap_icons.icon(canvas, xx+60, 60, 5, IconType.GENERIC_HOME, 30, 1.5f);
 
 					insidecv.outrectangle(canvas.width(), canvas.height());
 					int yy = insidecv.internalpoint(canvas.internalpoint(new Vector2i(0, window.input().mouseY()))).y;
