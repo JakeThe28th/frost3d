@@ -1,6 +1,5 @@
 Framebuffer completed!
 Framebuffer completed!
-Failed to load texture.
 Loaded icon 'stop'
 Loaded icon 'play'
 Loaded icon 'bg'
@@ -30,3 +29,10 @@ Loaded icon 'paste'
 Loaded icon 'trash'
 Loaded icon 'gear'
 Loaded icon 'giant_trash'
+Loaded icon 'up'
+Loaded icon 'down'
+Loaded icon 'left'
+Loaded icon 'star'
+Loaded icon 'hollow_square'
+Loaded icon 'heart'
+Loaded icon 'eye'

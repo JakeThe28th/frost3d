@@ -5,10 +5,12 @@ import org.joml.Vector2i;
 import org.joml.Vector4f;
 import frost3d.Framebuffer;
 import frost3d.GLState;
-import frost3d.conveniences.Icons;
+import frost3d.conveniences.BitmapIcons;
+import frost3d.conveniences.VectorIcons;
 import frost3d.data.BuiltinShaders;
 import frost3d.enums.Alignment;
 import frost3d.enums.FillMode;
+import frost3d.enums.IconType;
 import frost3d.interfaces.*;
 import frost3d.utility.Log;
 import frost3d.implementations.*;
@@ -90,8 +92,9 @@ public class DEMO_Canvas {
 				canvas.rect(70, 70, 170, 170, 4, khronos);
 				
 				canvas.color(new Vector4f(1,1,0.5f,1));
-				Icons.icon(canvas, xx, 60, 5, "home", 30);
-				
+				VectorIcons.icon(canvas, xx, 60, 5, IconType.GENERIC_HOME, 30);
+				BitmapIcons.icon(canvas, xx+30, 60, 5, IconType.GENERIC_HOME, 30, 1.5f);
+
 					insidecv.outrectangle(canvas.width(), canvas.height());
 					int yy = insidecv.internalpoint(canvas.internalpoint(new Vector2i(0, window.input().mouseY()))).y;
 					insidecv.color(new Vector4f(1,0,0,1));

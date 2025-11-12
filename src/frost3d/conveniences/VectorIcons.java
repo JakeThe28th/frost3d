@@ -9,17 +9,17 @@ import java.util.HashMap;
 import org.joml.Matrix4f;
 
 import frost3d.Shapes;
-import frost3d.implementations.*;
-import frost3d.interfaces.*;
+import frost3d.enums.IconType;
+import frost3d.implementations.SimpleMesh;
+import frost3d.interfaces.F3DCanvas;
 import frost3d.utility.Log;
 
-public class Icons {
-
-
-	static HashMap<String, GLMesh> icons = new HashMap<String, GLMesh>();
+public class VectorIcons {
 	
-	// Load the icons at startup
+	// Load the vector icons at startup
 	
+	static HashMap<String, SimpleMesh> icons = new HashMap<String, SimpleMesh>();
+		
 	static {
 		
 		String icons_file = "";
@@ -119,22 +119,27 @@ public class Icons {
 		}
 		
 	}
-	
+
 	// Drawing //
 	
-	public static void icon(F3DCanvas canvas, int x, int y, int z, String name, int size) {
-		if (Icons.icons.get(name) == null) throw new Error("No such icon: " + name);
+	public static void icon(F3DCanvas canvas, int x, int y, int z, IconType icon, int size) {
+		VectorIcons.icon(canvas, x, y, z, icon.vector, size);
+	}
+	
+	static void icon(F3DCanvas canvas, int x, int y, int z, String name, int size) {
+		if (icons.get(name) == null) throw new Error("No such icon: " + name);
 		
 		float scale = size;
 		canvas.queue(
-				Icons.icons.get(name), 
+				icons.get(name), 
 				new Matrix4f()
 					// Icons are made centered in Blender, 
 				    // so they're offset by 0.5
 					.translate(x + (scale/2f), y+(scale/2f), z) 
 					 // negative size cuz i didn't realize i was modeling the icons upside down....
 					.scale(size, -size, size),
-				Shapes.white);
+					Shapes.white);
 	}
 	
+
 }
