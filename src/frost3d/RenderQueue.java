@@ -106,11 +106,19 @@ public class RenderQueue {
 	Rectangle last_scissor = null;
 	GLShaderProgram last_shader = null;
 	
+	HashMap<String, Integer> 	last_intuniforms;
+	HashMap<String, Vector4f> 	last_vecuniforms;
+	HashMap<String, Matrix4f> 	last_matuniforms;
+	
 	public void render() {
 		last_mesh = null;
 		last_textures = new GLTexture[4];
 		last_scissor = null;
 		last_shader = null;
+		
+		last_intuniforms = new HashMap<>();
+		last_vecuniforms = new HashMap<>();
+		last_matuniforms = new HashMap<>();
 		
 		for (RenderState state : queue) {
 
@@ -120,17 +128,26 @@ public class RenderQueue {
 			}
 			
 			for (String uniform : state.intuniforms.keySet()) {
-				GLShaderProgram.uniform(uniform, state.intuniforms.get(uniform));
+				if (!state.intuniforms.get(uniform).equals(last_intuniforms.get(uniform))) {
+					GLShaderProgram.uniform(uniform, state.intuniforms.get(uniform));
+				}
 			}
+			last_intuniforms = state.intuniforms;
 			
 			for (String uniform : state.vecuniforms.keySet()) {
-				GLShaderProgram.uniform(uniform, state.vecuniforms.get(uniform));
+				if (!state.vecuniforms.get(uniform).equals(last_vecuniforms.get(uniform))) {
+					GLShaderProgram.uniform(uniform, state.vecuniforms.get(uniform));
+				}
 			}
-			
+			last_vecuniforms = state.vecuniforms;
+
 			for (String uniform : state.matuniforms.keySet()) {
-				GLShaderProgram.uniform(uniform, state.matuniforms.get(uniform));
+				if (!state.matuniforms.get(uniform).equals(last_matuniforms.get(uniform))) {
+					GLShaderProgram.uniform(uniform, state.matuniforms.get(uniform));
+				}
 			}
-			
+			last_matuniforms = state.matuniforms;
+
 			// .. //
 			
 			if (last_mesh != state.mesh) {
@@ -208,4 +225,6 @@ public class RenderQueue {
 	}
 
 	public int size() { return queue.size(); }
+	
+	public Rectangle current_scissor() { return scissors.peek(); }
 }

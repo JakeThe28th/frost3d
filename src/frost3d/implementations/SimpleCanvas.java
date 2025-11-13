@@ -125,7 +125,7 @@ public class SimpleCanvas implements F3DCanvas {
 		}
 		
 		public void text(int x, int y, int depth, String text) {
-			textrenderer.text(this, x, y, depth, text);
+			textrenderer.text(this, x, y, depth, text, renderqueue.current_scissor());
 		}
 		
 		public void icon(int x, int y, int depth, IconType icon) {

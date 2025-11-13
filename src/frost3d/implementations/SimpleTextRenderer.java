@@ -14,6 +14,7 @@ import frost3d.interfaces.F3DCanvas;
 import frost3d.interfaces.F3DTextRenderer;
 import frost3d.interfaces.GLMesh;
 import frost3d.interfaces.GLTexture;
+import frost3d.utility.Rectangle;
 
 public class SimpleTextRenderer implements F3DTextRenderer {
 
@@ -81,13 +82,26 @@ public class SimpleTextRenderer implements F3DTextRenderer {
 	/** Draw one line of text, where 0, 0 is the 'top left' of the character*<br>
 	 *  *Not exactly the top left, but close enough... */
 	public void text(F3DCanvas canvas, int x, int y, int z, String text) {
+		text(canvas, x, y, z, text, null);
+	}
+	
+	/** Draw one line of text, where 0, 0 is the 'top left' of the character*<br>
+	 *  *Not exactly the top left, but close enough... */
+	public void text(F3DCanvas canvas, int x, int y, int z, String text, Rectangle scissor_box) {
 		int xx = x + (int) (CORNER_X_OFFSET * font_size);
 			y  = y + (int) (CORNER_Y_OFFSET * font_size);
 		for (int i = 0; i < text.length(); i++) {
-			character(canvas, xx, y, z, text.charAt(i));
+			
 			// even though it doesn't throw an error, not casting here before adding to x causes weird drift
-			if (font.canDisplay(text.charAt(i)))  xx += (int) (font_size * CHARACTER_WIDTH);
-			if (!font.canDisplay(text.charAt(i))) xx += (int) (font_size * UNSUPPORTED_CHARACTER_WIDTH);
+			int advance = 0;
+			if (font.canDisplay(text.charAt(i)))  advance = (int) (font_size * CHARACTER_WIDTH);
+			if (!font.canDisplay(text.charAt(i))) advance = (int) (font_size * UNSUPPORTED_CHARACTER_WIDTH);
+			
+			if (!(scissor_box != null && (xx + (advance*2) < scissor_box.left() || (xx) > scissor_box.right()))) {
+				character(canvas, xx, y, z, text.charAt(i));	
+			}
+			
+			xx += advance;
 		}
 	}
 	
