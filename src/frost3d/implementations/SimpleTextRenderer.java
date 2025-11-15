@@ -8,15 +8,12 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 
 import org.joml.Matrix4f;
-import org.joml.Vector2f;
 import org.joml.Vector2i;
-import org.joml.Vector4f;
 
 import frost3d.interfaces.F3DCanvas;
 import frost3d.interfaces.F3DTextRenderer;
 import frost3d.interfaces.GLMesh;
 import frost3d.interfaces.GLTexture;
-import frost3d.utility.Log;
 import frost3d.utility.Rectangle;
 
 public class SimpleTextRenderer implements F3DTextRenderer {
@@ -107,16 +104,14 @@ public class SimpleTextRenderer implements F3DTextRenderer {
 			xx += advance;
 		}
 	}
-
+	
 	/** Draw one character of text */
 	protected void character(F3DCanvas canvas, int x, int y, int z, char character) {
-		canvas.uniform("texcoord_offset", offset(character));
 		canvas.queue(
 				mesh(character), 
 				new Matrix4f().translate(x, y, z), 
 				texture()
 				);
-		canvas.clear_uniform("texcoord_offset");
 	}
 	
 	private GLMesh mesh(char character) {
@@ -124,18 +119,10 @@ public class SimpleTextRenderer implements F3DTextRenderer {
 			textures.put(font_size, new TextureInfo(font_size));
 		}
 		TextureInfo info = textures.get(font_size);
-		return info.char_mesh();
-	}
-	
-	private Vector4f offset(char character) {
-		if (textures.get(font_size) == null) {
-			textures.put(font_size, new TextureInfo(font_size));
-		}
-		TextureInfo info = textures.get(font_size);
-		if (info.offsets.get(character) == null) {
+		if (info.meshes.get(character) == null) {
 			info.make(character);
 		}
-		return info.offsets.get(character);
+		return info.meshes.get(character);
 	}
 
 	private GLTexture texture() {
@@ -167,38 +154,7 @@ public class SimpleTextRenderer implements F3DTextRenderer {
 			return gltexture;
 		}
 		
-		GLMesh char_mesh; 
-		
-		public GLMesh char_mesh() {
-			if (char_mesh != null) return char_mesh;
-			
-			int unit_size = font_size*2;
-			
-		    int w = texture.getWidth();
-		    int h = texture.getHeight();
-		    
-			char_mesh = new SimpleMesh(new float[] {
-					unit_size,  unit_size, 	0.0f,  // top right
-					unit_size,  0, 			0.0f,  // bottom right
-				    0, 			0, 			0.0f,  // bottom left
-				    0,  		unit_size, 	0.0f   // top left 
-					},
-					new float[] {
-					((float) (unit_size)) / w, (((float) (0 + unit_size)) / h),
-					((float) (unit_size)) / w, (((float) (0            )) / h),
-					((float) (0            )) / w, (((float) (0            )) / h),
-					((float) (0            )) / w, (((float) (0 + unit_size)) / h),
-					},
-					new int[] {
-					    0, 1, 3,   // first triangles
-					    1, 2, 3    // second triangle
-					});
-					
-			return char_mesh;
-			
-		}
-
-		HashMap<Character, Vector4f> offsets = new HashMap<Character, Vector4f>(); 
+		HashMap<Character, GLMesh> meshes = new HashMap<Character, GLMesh>(); 
 		int character_index = 0;
 		
 		public TextureInfo(int font_size) {
@@ -239,14 +195,24 @@ public class SimpleTextRenderer implements F3DTextRenderer {
 		    int w = texture.getWidth();
 		    int h = texture.getHeight();
 		    
-	    	Vector4f charoffset = new Vector4f(
-					((float) (unit_x)) / w,
-					((float) (unit_y)) / h, 
-					0, 
-					0
-					);
+	    	SimpleMesh mesh = new SimpleMesh(new float[] {
+	    			unit_size,  unit_size, 	0.0f,  // top right
+	    			unit_size,  0, 			0.0f,  // bottom right
+				    0, 			0, 			0.0f,  // bottom left
+				    0,  		unit_size, 	0.0f   // top left 
+					},
+					new float[] {
+					((float) (unit_x + unit_size)) / w, (((float) (unit_y + unit_size)) / h),
+					((float) (unit_x + unit_size)) / w, (((float) (unit_y            )) / h),
+					((float) (unit_x            )) / w, (((float) (unit_y            )) / h),
+					((float) (unit_x            )) / w, (((float) (unit_y + unit_size)) / h),
+					},
+					new int[] {
+					    0, 1, 3,   // first triangles
+					    1, 2, 3    // second triangle
+					});
 	    	
-	    	offsets.put(character, charoffset);
+	    	meshes.put(character, mesh);
 	    	
 	    	character_index++;
 
