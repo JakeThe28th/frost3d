@@ -96,8 +96,11 @@ public class BuiltinShaders {
 				in vec2 f_texcoord;
 				uniform vec4 mix_color;
 
+				uniform vec4 texcoord_offset = vec4(0, 0, 0, 0);
+
 				void main() {
-					FragColor = texture(texture_image, f_texcoord) * mix_color;
+					vec2 t_offset = vec2(texcoord_offset.x, texcoord_offset.y);
+					FragColor = texture(texture_image, f_texcoord + t_offset) * mix_color;
 					if (FragColor.a < 0.001) discard;
 				} 
 			""");
