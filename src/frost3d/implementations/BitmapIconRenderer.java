@@ -24,6 +24,7 @@ public class BitmapIconRenderer implements F3DIconRenderer {
 	
 	public BitmapIconRenderer() {
 		File bitmap_icons_dir = new File("assets/icons/");
+		if (!bitmap_icons_dir.exists()) return;
 		for (File iconimg : bitmap_icons_dir.listFiles()) {
 			try {
 				bitmap_icons.put(iconimg.getName().substring(0, iconimg.getName().lastIndexOf('.')), new SimpleTexture(iconimg.getPath()));
