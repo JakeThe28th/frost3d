@@ -166,5 +166,9 @@ public class Input {
 	public boolean keyDown(int key) {
 		return down_keys[GLFW.glfwGetKeyScancode(key)];
 	}
+	
+	public boolean keyReleased(int key) {
+		return action(GLFW.glfwGetKeyScancode(key)) == GLFW.GLFW_RELEASE;
+	}
 
 }
