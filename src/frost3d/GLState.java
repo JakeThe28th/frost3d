@@ -14,7 +14,7 @@ import org.lwjgl.glfw.GLFWErrorCallback;
 public class GLState {
 
 	public static long current_context;	
-	public static int current_shader;
+	public static GLShaderProgram current_shader;
 	
 	public static void destroyContext(long window_identifier) { /* Shaders.destroyContext(window_identifier); */ }
 	

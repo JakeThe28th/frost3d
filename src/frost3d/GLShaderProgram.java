@@ -9,6 +9,8 @@ import static org.lwjgl.opengl.GL20.glGetShaderi;
 import static org.lwjgl.opengl.GL20.glShaderSource;
 import static org.lwjgl.opengl.GL20.glUseProgram;
 
+import java.util.HashMap;
+
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 import org.lwjgl.opengl.GL40;
@@ -23,7 +25,7 @@ public class GLShaderProgram {
 	int program; // Shader program reference
 	Long context; // The context this shader was compiled in
 	
-	public void bind() { glUseProgram(program); GLState.current_shader = program; }
+	public void bind() { glUseProgram(program); GLState.current_shader = this; }
 	public void free() { glDeleteProgram(program); }
 	
 	public GLShaderProgram(String vertex_source, String fragment_source) {
@@ -67,11 +69,19 @@ public class GLShaderProgram {
 		}
 		return shader;
 	}
+
+	HashMap<String, Integer> uniform_locations = new HashMap<>();
 	
+	private int location(String uniform) {
+		if (!uniform_locations.containsKey(uniform)) {
+			uniform_locations.put(uniform, GL40.glGetUniformLocation(program, uniform));
+		}
+		return uniform_locations.get(uniform);
+	}
 
 	public static void uniform(String uniform, Matrix4f matrix) {
 		GL40.glUniformMatrix4fv(
-				GL40.glGetUniformLocation(GLState.current_shader, uniform), 
+				GLState.current_shader.location(uniform),
 				false, 
 				floats(matrix)
 			);
@@ -79,7 +89,7 @@ public class GLShaderProgram {
 
 	public static void uniform(String uniform, Vector4f vector) {
 		GL40.glUniform4f(
-				GL40.glGetUniformLocation(GLState.current_shader, uniform), 
+				GLState.current_shader.location(uniform),
 				vector.x, 
 				vector.y, 
 				vector.z, 
@@ -89,7 +99,7 @@ public class GLShaderProgram {
 	
 	public static void uniform(String uniform, int integer) {
 		GL40.glUniform1i(
-				GL40.glGetUniformLocation(GLState.current_shader, uniform), 
+				GLState.current_shader.location(uniform),
 				integer
 			);
 	}

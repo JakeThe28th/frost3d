@@ -1,5 +1,7 @@
 package frost3d.interfaces;
 
+import java.util.HashMap;
+
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 
@@ -33,6 +35,11 @@ public interface F3DCanvas {
 	public void color(Vector4f color);
 	
 	public void clear_color(float r, float g, float b, float a);
+	
+	public void uniform(String name, int v);
+	public void uniform(String name, Vector4f v);
+	public void uniform(String name, Matrix4f v);
+	public void clear_uniform(String name);
 	
 	// -- ++ DRAWING ++ -- //
 	

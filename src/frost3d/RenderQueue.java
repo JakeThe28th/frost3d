@@ -64,6 +64,17 @@ public class RenderQueue {
 		matuniforms.put(name, v);
 	}
 	
+	public void clear_uniform(String name) {
+		intuniforms = new HashMap<String, Integer>(intuniforms);
+		intuniforms.remove(name);
+		
+		vecuniforms = new HashMap<String, Vector4f>(vecuniforms);
+		vecuniforms.remove(name);
+		
+		matuniforms = new HashMap<String, Matrix4f>(matuniforms);
+		matuniforms.remove(name);
+	}
+	
 	public LimitedStack<Rectangle> 	scissors() 					{ return scissors  ; }
 	public void 				 	mesh(GLMesh m) 				{ mesh 			= m; }
 	public void 					textures(GLTexture... t) 	{ textures 		= t; }

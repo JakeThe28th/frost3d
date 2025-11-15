@@ -105,6 +105,11 @@ public class SimpleCanvas implements F3DCanvas {
 						
 		}
 		
+		@Override public void 		uniform(String name, int 	  v) { renderqueue.uniform(name, v); }
+		@Override public void 		uniform(String name, Vector4f v) { renderqueue.uniform(name, v); }
+		@Override public void 		uniform(String name, Matrix4f v) { renderqueue.uniform(name, v); }
+		@Override public void clear_uniform(String name			   ) { renderqueue.clear_uniform(name);}
+		
 		// -- ** Drawing API ** -- //
 		
 		public void rect(Rectangle bounds, int depth) {
@@ -163,5 +168,5 @@ public class SimpleCanvas implements F3DCanvas {
 		}
 		
 		public int queue_size() { return renderqueue.size(); }
-
+	
 }
