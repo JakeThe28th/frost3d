@@ -8,6 +8,7 @@ import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glClearColor;
 
+import org.joml.Vector4f;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
 
@@ -21,6 +22,7 @@ public class GLState {
 	/** Clear the currently bound framebuffer. */
 	public static void clear() { glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); }
 	public static void clearColor(float r, float g, float b, float a)	{ glClearColor(r, g, b, a);	}
+	public static void clearColor(Vector4f color) { glClearColor(color.x, color.y, color.z, color.w);	}
 
 	public static void initializeGLFW() {
 		System.out.println("Hello LWJGL " + Version.getVersion() + "!");	

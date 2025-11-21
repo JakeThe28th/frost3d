@@ -167,6 +167,10 @@ public class SimpleCanvas implements F3DCanvas {
 			clear_color = new Vector4f(r,g,b,a);
 		}
 		
+		public void clear_color(Vector4f color) {
+			clear_color = color;
+		}
+		
 		public int queue_size() { return renderqueue.size(); }
 	
 }
