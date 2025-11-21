@@ -37,6 +37,23 @@ public record FloatRectangle(float left, float top, float right, float bottom) {
 				(int) (top + (height() * tp)), 
 				(int) (left + (width() * rp)), 
 				(int) (top + (height() * bp)));
+	}
+
+	public FloatRectangle normalizeFrom_NegativeOneToOne_TO_ZeroToOne() {
+		return new FloatRectangle(
+				(left + 1) /2,
+				(top + 1) /2,
+				(right + 1) /2,
+				(bottom + 1) /2
+			);
+	}
+
+	public FloatRectangle multiply(int x, int y) {
+		return new FloatRectangle(left * x, top * y, right * x, bottom *y);
+	}
+
+	public Rectangle toIntegerRectangle() {
+		return new Rectangle((int) left, (int) top, (int) right, (int) bottom);
 	} 
 	
 }

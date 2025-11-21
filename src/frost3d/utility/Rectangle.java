@@ -88,4 +88,12 @@ public record Rectangle(int left, int top, int right, int bottom) {
 			);
 	}
 
+	public Rectangle flipY() {
+		return new Rectangle(left, bottom, right, top);
+	}
+
+	public Rectangle expand(int i) {
+		return new Rectangle(left - i, top - i, right + i, bottom + i);
+	}
+
 }
