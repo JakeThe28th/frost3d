@@ -1,7 +1,6 @@
 package frost3d.implementations;
 
 import org.joml.Matrix4f;
-import org.joml.Vector2i;
 import org.joml.Vector4f;
 
 import frost3d.Framebuffer;
@@ -94,15 +93,14 @@ public class SimpleCanvas implements F3DCanvas {
 		
 		// -- **  ** -- //
 
-		public void draw_frame() {
-			
+		public void draw_frame() { draw_frame(true); }
+		public void draw_frame(boolean clear) {
 			// clear the framebuffer
 			if (framebuffer != null) framebuffer.bind();
-			GLState.clearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
-			GLState.clear();
+			if (clear) GLState.clearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+			if (clear) GLState.clear();
 			
-			renderqueue.render();
-						
+			renderqueue.render();			
 		}
 		
 		@Override public void 		uniform(String name, int 	  v) { renderqueue.uniform(name, v); }
@@ -111,6 +109,10 @@ public class SimpleCanvas implements F3DCanvas {
 		@Override public void clear_uniform(String name			   ) { renderqueue.clear_uniform(name);}
 		
 		// -- ** Drawing API ** -- //
+		
+		public void rect(float left, float top, float right, float bottom, float depth) {
+			Shapes.rect(this, (int) left, (int) top, (int) right, (int) bottom, (int) depth);
+		}
 		
 		public void rect(Rectangle bounds, int depth) {
 			Shapes.rect(this, bounds.left(), bounds.top(), bounds.right(), bounds.bottom(), depth);

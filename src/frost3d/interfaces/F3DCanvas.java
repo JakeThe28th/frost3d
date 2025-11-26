@@ -1,7 +1,5 @@
 package frost3d.interfaces;
 
-import java.util.HashMap;
-
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 
