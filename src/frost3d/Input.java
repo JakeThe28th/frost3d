@@ -6,6 +6,7 @@ import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetMouseButtonCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetScrollCallback;
 
+import org.joml.Vector2i;
 import org.lwjgl.glfw.GLFW;
 
 public class Input {
@@ -33,6 +34,8 @@ public class Input {
 		current_keys = new Key[1024];
 		current_mouse_buttons = new MouseButton[8];
 		mouse_scroll_x = 0; mouse_scroll_y = 0;
+		changed_focus_state = false;
+		any_key_pressed = false;
 	}
 	
 	public record Key(int key, int scancode, int action, int mods) {};
@@ -48,9 +51,15 @@ public class Input {
 	Key				last_key 				= null;
 	double			mouse_x					= 0;
 	double			mouse_y					= 0;
+	Vector2i		mouse_pos				= new Vector2i(0, 0);
 	boolean			is_iconified			= false;
+	boolean 		is_focused				= true;
+	boolean 		changed_focus_state		= true;
+	boolean			any_key_pressed			= false;
 
 	public Input(long current_window) {
+		
+		is_focused = GLFW.glfwGetWindowAttrib(current_window, GLFW.GLFW_FOCUSED) == GLFW.GLFW_TRUE;
 		
 		// Setup a key callback. It will be called every time a key is pressed, repeated or released.
 		glfwSetKeyCallback(current_window, (_, key, scancode, action, mods) -> {
@@ -65,6 +74,7 @@ public class Input {
 				if (key == GLFW.GLFW_KEY_BACKSPACE && input_string.length() > 0) 
 					input_string = input_string.substring(0, input_string.length()-1);
 
+			if (action == GLFW.GLFW_PRESS) any_key_pressed = true;
 			
 			//Log.send(scancode + " : " + key);
 			//if ( key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE )
@@ -98,6 +108,11 @@ public class Input {
 			has_input_this_frame();
 			is_iconified = iconified;
 		});
+		
+		GLFW.glfwSetWindowFocusCallback(current_window, (_, focused) -> {
+			is_focused = focused;
+			changed_focus_state = true;
+		});
 	}
 
 	private void setMouseButtonDown(int button, boolean b) {
@@ -124,9 +139,16 @@ public class Input {
 	private void setMousePos(double xpos, double ypos) {
 		mouse_x = xpos;
 		mouse_y = ypos;
+		mouse_pos = new Vector2i((int) xpos, (int) ypos);
 	}
 	
 	// -- Getters -- //
+	
+	public boolean focused() { return is_focused; }
+	
+	public boolean any_key_pressed() { return any_key_pressed; }
+
+	public String input_string() { return input_string; }
 	
 	public int action(int scancode) { return getKeyActionWithScancode(scancode); }
 	
@@ -137,6 +159,8 @@ public class Input {
 	
 	public int mouseX() { return (int) mouse_x; }
 	public int mouseY() { return (int) mouse_y; }
+
+	public Vector2i mousePos() { return mouse_pos; }
 	
 	public boolean mouseButtonDown(int button) {
 		return down_mouse_buttons[button];
@@ -170,5 +194,20 @@ public class Input {
 	public boolean keyReleased(int key) {
 		return action(GLFW.glfwGetKeyScancode(key)) == GLFW.GLFW_RELEASE;
 	}
+	
+	public boolean keyRepeated(int key) {
+		return action(GLFW.glfwGetKeyScancode(key)) == GLFW.GLFW_REPEAT;
+	}
 
+	// -- Setters -- //
+	
+	public void input_string(String s) { input_string = s; }
+
+	public static void setClipboardString(String string) {
+		GLFW.glfwSetClipboardString(-1, string);
+	}
+
+	public static String getClipboardString() {
+		return GLFW.glfwGetClipboardString(-1);
+	}
 }
