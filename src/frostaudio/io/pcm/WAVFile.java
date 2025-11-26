@@ -71,6 +71,7 @@ public class WAVFile implements AudioFile {
 	public void readRIFFChunk(ByteBuffer buff) throws UnsupportedAudioFileException {
 		
 		// Size of master chunk
+		@SuppressWarnings("unused")
 		int RIFF_chunk_size = buff.getInt(); // 4 bytes
 		
 		// WAVE identifier
@@ -121,7 +122,9 @@ public class WAVFile implements AudioFile {
 	}
 	
 	public void readFactChunk(ByteBuffer buff) throws UnsupportedAudioFileException {
+		@SuppressWarnings("unused")
 		int chunk_size = buff.getInt(); 
+		@SuppressWarnings("unused")
 		int dwSampleLength = buff.getInt();
 	}
 	
@@ -133,12 +136,15 @@ public class WAVFile implements AudioFile {
 		if (chunk_size != 16) 
 		if (chunk_size != 40) throw new UnsupportedAudioFileException("Non 16 or 40 chunk-size wav file is not supported");
 		
+		@SuppressWarnings("unused")
 		int format = buff.getShort(); 			// 2 bytes
 		this.channels = buff.getShort(); 		// 2 bytes
 		
 		this.sample_rate = buff.getInt();  	 	// 4 bytes
+		@SuppressWarnings("unused")
 		int data_rate = buff.getInt(); 			// 4 bytes
 		
+		@SuppressWarnings("unused")
 		int data_block_size = buff.getShort(); 	// Next 2 bytes
 		this.bits_per_sample = buff.getShort(); // Next 2 bytes
 		
