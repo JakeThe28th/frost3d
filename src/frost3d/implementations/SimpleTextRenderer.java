@@ -92,21 +92,32 @@ public class SimpleTextRenderer implements F3DTextRenderer {
 			y  = y + (int) (CORNER_Y_OFFSET * font_size);
 		for (int i = 0; i < text.length(); i++) {
 			
-			// even though it doesn't throw an error, not casting here before adding to x causes weird drift
-			int advance = 0;
-			if (font.canDisplay(text.charAt(i)))  advance = (int) (font_size * CHARACTER_WIDTH);
-			if (!font.canDisplay(text.charAt(i))) advance = (int) (font_size * UNSUPPORTED_CHARACTER_WIDTH);
+			int advance = advance(text, i);
 			
 			if (!(scissor_box != null && (xx + (advance*2) < scissor_box.left() || (xx) > scissor_box.right()))) {
-				character(canvas, xx, y, z, text.charAt(i));	
+				rawcharacter(canvas, xx, y, z, text.charAt(i));	
 			}
 			
 			xx += advance;
 		}
 	}
 	
+	public int advance(String text, int i) {
+		// even though it doesn't throw an error, not casting here before adding to x causes weird drift
+		int advance = 0;
+		if (font.canDisplay(text.charAt(i)))  advance = (int) (font_size * CHARACTER_WIDTH);
+		if (!font.canDisplay(text.charAt(i))) advance = (int) (font_size * UNSUPPORTED_CHARACTER_WIDTH);
+		return advance;
+	}
+	
 	/** Draw one character of text */
-	protected void character(F3DCanvas canvas, int x, int y, int z, char character) {
+	public void character(F3DCanvas canvas, int x, int y, int z, char character) {
+		x += (int) (CORNER_X_OFFSET * font_size);
+		y += (int) (CORNER_Y_OFFSET * font_size);
+		rawcharacter(canvas, x, y, z, character);
+	}
+	
+	private void rawcharacter(F3DCanvas canvas, int x, int y, int z, char character) {
 		canvas.queue(
 				mesh(character), 
 				new Matrix4f().translate(x, y, z), 
