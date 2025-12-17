@@ -96,4 +96,9 @@ public record Rectangle(int left, int top, int right, int bottom) {
 		return new Rectangle(left - i, top - i, right + i, bottom + i);
 	}
 
+	public Rectangle multiply(float mul) {
+		return new Rectangle((int) (left * mul), (int) (top * mul), (int) (right * mul), (int) (bottom * mul));
+
+	}
+
 }

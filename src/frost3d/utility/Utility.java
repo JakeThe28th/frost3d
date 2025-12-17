@@ -24,6 +24,14 @@ public class Utility {
 				1);
 	}
 	
+	public static String toHex(Vector4f value) {
+		return "#" 
+				+ String.format("%02x", (int) (value.x * 255))
+				+ String.format("%02x", (int) (value.y * 255))
+				+ String.format("%02x", (int) (value.z * 255));
+				
+	}
+	
 	// css_rgba(82, 52, 145, 0.34)
 	public static Vector4f fromRGBADecimal(String rgba) {
 		rgba = rgba.substring(9, rgba.length()-1);

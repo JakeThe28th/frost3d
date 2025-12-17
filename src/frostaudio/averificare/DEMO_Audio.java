@@ -12,6 +12,16 @@ public class DEMO_Audio {
 		// Test switching audio devices
 		
 		// TODO
+		
+		// Test Real time Sound Generation (sine wave...)
+		
+		// Test Real time Sound Mixing
+		
+		// Test Real Time Effects (reverb?)
+		
+		// Test Timing / make sure everything is syncd properly
+		
+		// BPM thing??
 
 	}
 

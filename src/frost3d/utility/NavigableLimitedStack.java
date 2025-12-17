@@ -8,6 +8,11 @@ public class NavigableLimitedStack<T> {
 	
 	ArrayList<T> data = new ArrayList<T>();
 	
+	public void clear() {
+		data.clear();
+		idx = -1;
+	}
+	
 	public NavigableLimitedStack<T> push(T item) {
 		idx++;
 		while (size() > idx) {
