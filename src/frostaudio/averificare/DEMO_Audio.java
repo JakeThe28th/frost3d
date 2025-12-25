@@ -5,7 +5,8 @@ import java.io.IOException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 import frost3d.utility.Log;
-import frostaudio.AudioDevice;
+import frostaudio.ALDevice;
+import frostaudio.ALSource;
 import frostaudio.AudioSource_OLD;
 import frostaudio.io.pcm.WAVFile;
 
@@ -13,16 +14,21 @@ public class DEMO_Audio {
 
 	public static void main(String[] args) throws IOException, UnsupportedAudioFileException {
 		
-		AudioDevice default_device = AudioDevice.preffered();
+		ALDevice default_device = ALDevice.preffered();
 		
-		AudioDevice.printInfo();
+		ALDevice.printInfo();
 		
-		AudioSource_OLD s = new AudioSource_OLD();
-		s.addAudio(new WAVFile("rgp_minor_conversation2.wav"));
+//		AudioSource_OLD s = new AudioSource_OLD();
+//		s.addAudio(new WAVFile("rgp_minor_conversation2.wav"));
 		
+		ALSource s = new ALSource();
+		s.addAudio(new WAVFile("rgp_rain_shortloop.wav"));
 		
+		//todo: redo audio source
 		
 		s.play();
+		
+		//s.loop(true);
 		
 		while (!s.ALstopped()) {
 

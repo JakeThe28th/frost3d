@@ -49,6 +49,7 @@ public class AudioDevice_OLD {
 	
 	/** Returns the device identifier of the default device. */
 	public static String defaultDevice() { return alcGetString(NULL, ALC_DEFAULT_DEVICE_SPECIFIER); }
+	// ^^^ what's the difference from ALC_DEFAULT_ALL_DEVICES_SPECIFIER ...
 	
 	/** Set the listener volume for the current context */
 	public void setListenerVolume(float v) { alListenerf(AL_GAIN, v); }
