@@ -5,6 +5,8 @@ import frost3d.utility.Log;
 /** NOTE: Audio is assumed stereo. */
 public class AudioMixer {
 	
+	int max_data_length;
+	
 	ALSource mix_output;
 
 	public ALSource output() {
@@ -14,10 +16,11 @@ public class AudioMixer {
 	public AudioMixer() {
 		mix_output = new ALSource();
 		mix_output.buffferCount(2);
-		mix_output.bufferFrameAmtMS(20);
+		mix_output.bufferFrameAmtMS(500);
 		mix_output.auto_stop(false);
 		mix_output.channels(2);
 		mix_output.directChannels(true);
+		max_data_length = mix_output.msToSamples(1000);
 	}
 	
 	/** Mixes samples into the output as soon as possible:<br>
@@ -66,12 +69,34 @@ public class AudioMixer {
 	}
 
 	public void update() {
-		if ((mix_output.lengthMillis() - mix_output.currentTimeMillis()) < 1000) {
-			insert(new short[mix_output.msToSamples(10000)], 0);
+		if ((mix_output.lengthMillis() - mix_output.currentTimeMillis()) <= 100) {
+			insert(noise(mix_output.msToSamples(1000)), 1);
 			Log.send("Added");
 		}
-		mix_output.ALplay();
+		if (mix_output.frameCount() > max_data_length) {
+			short[] new_data = new short[max_data_length];
+			for (int i = 0; i < new_data.length && mix_output.last_sample+i < mix_output.data.length ; i++) {
+				new_data[i] = mix_output.data[mix_output.last_sample+i];
+			}
+			mix_output.next_sample -= mix_output.last_sample;
+			mix_output.last_sample = 0;
+		}
 		mix_output.update();
+		//mix_output.ALplay();
+	}
+
+	private short[] noise(int length) {
+		short[] data = new short[length];
+		for (int i = 0; i < data.length; i+=2) {
+			short val = (short) (Math.random() * (float) (Short.MAX_VALUE / 8));
+			data[i] = val;
+			data[i+1] = val;
+		}
+		return data;
+	}
+
+	public long lengthMillis() {
+		return currentTimeMillis() + (mix_output.lengthMillis() - mix_output.currentTimeMillis());
 	}
 	
 }

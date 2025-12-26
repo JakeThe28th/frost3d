@@ -50,7 +50,7 @@ public class ALSource {
 
 	protected int 	next_sample 		= 0; 	// The index of the sample after the last buffered sample
 	protected int 	last_sample 		= 0;	// The index of the end of the samples that have been buffered and played
-				
+	
 	private boolean loop 				= false;							 // If the source loops when out of data.
 	private boolean auto_stop			= true;								 // Automatically run stop() when out of data.
 
@@ -91,8 +91,12 @@ public class ALSource {
 	// It seems AL11.AL_SAMPLE_OFFSET is in *frames*, not samples. So, multiply it by two.
 	public int  currentTimeSamples() { return last_sample + (alGetSourcei(source, AL11.AL_SAMPLE_OFFSET) * channels); }
 	public long currentTimeMillis () { return samplestoMs(currentTimeSamples()); }
+	
+	public float lastBufferTimeMillis() { return samplestoMs(last_sample); }
+	public float nextBufferTimeMillis() { return samplestoMs(next_sample); }
 
 	public int 	sampleCount 	  () { return data.length; }
+	public int 	frameCount 	  	  () { return data.length / channels; }
 	public long lengthMillis	  () { return samplestoMs(sampleCount()); }
 	
 	public int  msToSamples (long milliseconds) { return (int) 	( milliseconds * (sample_rate / 1000) ) * channels; }
@@ -188,7 +192,10 @@ public class ALSource {
 	/** Play audio from this source. */
 	public void play() { 
 		// Buffer the initial audio for this source.
-		if (!playing) for (int buffer : buffers) { bufferAudio(buffer); }
+		if (ALstopped()) {
+			last_sample = next_sample;
+			for (int buffer : buffers) { bufferAudio(buffer); }
+		}
 		alSourcePlay(source); 
 		playing = true;
 	}
@@ -235,17 +242,17 @@ public class ALSource {
 	 * I don't feel like wrapping this in a while loop and having ugly indentation, so I split the method instead... */
 	private int update_internal() {
 		if (!playing) return 0;
-
+		
+		int processed = alGetSourcei(source, AL_BUFFERS_PROCESSED);
+		
 		// Start queuing from the beginning again when looping
 		if (loop && next_sample >= data.length) next_sample = 0;
 	
 		// Stop if no more samples are left. 
 		if (!loop && next_sample >= data.length && ALstopped() && auto_stop) 	stop(); 
 		// Restart if stopped due to lag
-		else if (ALstopped()) 									     			alSourcePlay(source);
-		
-		int processed = alGetSourcei(source, AL_BUFFERS_PROCESSED);
-		
+		else if (ALstopped()) 									     			play();
+				
 		if (processed > 0 ) {	
 			int processed_buffer = alSourceUnqueueBuffers(source);
 			last_sample += alGetBufferi(processed_buffer, AL_SIZE) / (BYTES_PER_SAMPLE);
@@ -270,4 +277,5 @@ public class ALSource {
         alBufferData(buffer, channels == 1 ? AL11.AL_FORMAT_MONO16 : AL11.AL_FORMAT_STEREO16, sample_data, sample_rate);
         alSourceQueueBuffers(source, buffer);
 	}
+	
 }
