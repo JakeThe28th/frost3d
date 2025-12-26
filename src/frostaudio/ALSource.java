@@ -38,29 +38,42 @@ public class ALSource {
 	
 	// -- == global properties == -- //
 
-	static final int BYTES_PER_SAMPLE = 2; 					// 16-bit PCM
+	static final int BYTES_PER_SAMPLE = 2; 									 // 16-bit PCM
 	
 	// -- == instance properties == -- //
 	
-	private int 	channels 			= 2;							// 1 for mono, 2 for stereo
-	private int 	sample_rate			= 44100;						// Samples per second
+	private int 	channels 			= 2;								 // 1 for mono, 2 for stereo
+	private int 	sample_rate			= 44100;							 // Samples per second
 
-	private int 	buffer_count 		= 8;							// The number of buffers to cycle between
-	private int 	buffer_amt 			= (sample_rate / 4) * channels; // The number of PCM samples to buffer at once.
+	private int 	buffer_count 		= 8;								 // The number of buffers to cycle between
+	private int 	buffer_amt 			= ((int) ( 44.1 * 40) ) * channels; // The number of PCM samples to buffer at once.
 
-	private int 	next_sample 		= 0; 	// The index of the sample after the last buffered sample
-	private int 	last_sample 		= 0;	// The index of the end of the samples that have been buffered and played
+	protected int 	next_sample 		= 0; 	// The index of the sample after the last buffered sample
+	protected int 	last_sample 		= 0;	// The index of the end of the samples that have been buffered and played
 				
-	private boolean loop 				= false;						// If the source loops when out of data.
+	private boolean loop 				= false;							 // If the source loops when out of data.
+	private boolean auto_stop			= true;								 // Automatically run stop() when out of data.
 
 	// -- == setters == -- //
-
+	
 	public 	void 	channels		 (int count) 			 	 { channels = count; }
 	public 	void 	sampleRate		 (int rate) 			 	 { sample_rate = rate; }
 	public 	void 	loop			 (boolean value)    	 	 { loop = value; }
+	public 	void 	auto_stop		 (boolean value)    	 	 { auto_stop = value; }
 	public	void 	position		 (float x, float y, float z) { Log.send("Unimplemented method :: ALSource.position"); }
 	public  void 	maxVolume		 (float limit) 				 { alSourcef(source, AL_MAX_GAIN, limit); }
 	public  void 	volume			 (float volume) 			 { alSourcef(source, AL_GAIN, 	 volume); }
+	
+	public  void	bufferFrameAmtMS (int millis)				 { bufferFrameAmt((int) ((sample_rate/1000f) * millis)); }
+	public  void	bufferFrameAmt	 (int amount)				 { buffer_amt = amount * channels; }
+
+	public void 	buffferCount	 (int count ) { 
+		if (playing) pause();
+		freeBuffers();
+		buffer_count = count;
+		buffers 	 = new int[buffer_count];
+		generateBuffers();
+	}
 	
 	/** https://openal-soft.org/openal-extensions/SOFT_direct_channels.txt <br>
 	 *  Without this enabled, stereo audio sounds weird...  */
@@ -160,41 +173,43 @@ public class ALSource {
 	
 	                                          // -- == playback == -- //
 	
-	public static enum State { STOPPED, PAUSED, PLAYING }
-	State state = State.STOPPED;
+	boolean playing = false;
 	
 	// -- == getters == -- //
-
-	public boolean stopped() { return state == State.STOPPED; }
-	public boolean paused()  { return state == State.PAUSED;  }
-	public boolean playing() { return state == State.PLAYING; }
-
+	
+	public boolean playing() { return playing; }
+	
+	/** Play audio from this source without buffering any audio initially. */
+	public void ALplay() { 
+		if (ALstopped()) alSourcePlay(source); 
+		playing = true;
+	}
 
 	/** Play audio from this source. */
 	public void play() { 
 		// Buffer the initial audio for this source.
-		if (state == State.STOPPED) for (int buffer : buffers) { bufferAudio(buffer); }
+		if (!playing) for (int buffer : buffers) { bufferAudio(buffer); }
 		alSourcePlay(source); 
-		state = State.PLAYING;
-		}
+		playing = true;
+	}
 	
 	/** Pause audio from this source. */
 	public void pause() {
-		alSourceStop(source);
-		state = State.PAUSED;
+		next_sample = currentTimeSamples();
+		last_sample = next_sample;
+		reset();
 	}
 	
 	/** Stop audio from this source, remove buffers, and rewind.*/
 	public void stop() { 
 		seek(0);
-		state = State.STOPPED;
 	} 
 	
 	/** Stop audio from this source, remove buffers, but don't rewind.*/
 	private void reset() { 
 		alSourceStop(source);
 		alSourcei(source, AL_BUFFER, 0);
-		state = State.STOPPED;
+		playing = false;
 	} 
 	
 	/** Seek to a specific time in milliseconds. */
@@ -219,13 +234,15 @@ public class ALSource {
 	/** 'next_sample' needs to check and be set to 0 for looping after every call to bufferAudio(). 
 	 * I don't feel like wrapping this in a while loop and having ugly indentation, so I split the method instead... */
 	private int update_internal() {
-		if (state != State.PLAYING) return 0;
+		if (!playing) return 0;
 
 		// Start queuing from the beginning again when looping
 		if (loop && next_sample >= data.length) next_sample = 0;
 	
-		     if (!loop && next_sample >= data.length && ALstopped()) stop(); // Properly stop if no more samples are left
-		else if (ALstopped()) 									     alSourcePlay(source); // Restart if stopped due to lag
+		// Stop if no more samples are left. 
+		if (!loop && next_sample >= data.length && ALstopped() && auto_stop) 	stop(); 
+		// Restart if stopped due to lag
+		else if (ALstopped()) 									     			alSourcePlay(source);
 		
 		int processed = alGetSourcei(source, AL_BUFFERS_PROCESSED);
 		
