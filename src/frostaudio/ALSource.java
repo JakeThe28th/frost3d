@@ -192,8 +192,8 @@ public class ALSource {
 	/** Play audio from this source. */
 	public void play() { 
 		// Buffer the initial audio for this source.
-		if (ALstopped()) {
-			last_sample = next_sample;
+		if (ALstopped() || !playing) {
+			reset(); // make sure the source is empty
 			for (int buffer : buffers) { bufferAudio(buffer); }
 		}
 		alSourcePlay(source); 
@@ -269,6 +269,7 @@ public class ALSource {
 		if (channels == 2 && (buffer_amt & 1) != 0) {
 			throw new IllegalStateException("Buffer amount isn't divisible by [channels], " + buffer_amt + "/" + channels);
 		}
+
 		// Store either 'buffer_sample_count' or the remaining amount samples, into 'sample_data', whichever is fewer.
 		short[] sample_data = new short[(next_sample + buffer_amt > data.length) ? data.length-next_sample : buffer_amt];
 		for (int i = 0; i < sample_data.length; i++) sample_data[i] = data[next_sample+i];
