@@ -222,8 +222,8 @@ public class DEMO_Audio {
 		s.addAudio(new WAVFile("rgp_rain_shortloop.wav"));
 		s.play();
 		s.loop(true);
-		
-		while (!s.ALstopped()) {
+				
+		while (s.playing()) {
 			if (!default_device.isConnected()) {
 				Log.send("Audio Device Disconnected");
 				default_device.migrateToPreferred();
