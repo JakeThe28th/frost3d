@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.joml.Vector2d;
+import org.joml.Vector3d;
 import org.joml.Vector4f;
 
 import frost3d.enums.Alignment;
@@ -343,6 +344,66 @@ public class Utility {
 			return new Rectangle(min_x, min_y, max_x+1, max_y+1);
 		}
 	}
-
 	
+	
+	// -- 2D Stuff ported from the rope physics...-- // 
+
+	public static double angle2d(double x1, double y1, double x2, double y2)
+	{
+	    double angle = Math.toDegrees(Math.atan2(x2 - x1, y2 - y1));
+	    // Keep angle between 0 and 360
+	    angle = angle + Math.ceil( -angle / 360 ) * 360;
+
+	    return Math.toRadians(angle);
+	}
+	
+	// -- 3D Stuff ported from the rope physics mod...-- // 
+
+	/** (3D) Returns the distance between two points */
+    public static float distance(Vector3d point0, Vector3d point1) {
+        double x_delta = point0.x-point1.x;
+        double y_delta = point0.y-point1.y;
+        double z_delta = point0.z-point1.z;
+
+        double distance_horizontal = Math.sqrt((x_delta*x_delta) + (z_delta*z_delta));
+        return (float) Math.sqrt((distance_horizontal*distance_horizontal) + (y_delta*y_delta));
+    }
+
+    /** (3D) Returns a point stepped towards a target by a certain amount */
+    public static Vector3d towards(Vector3d origin, Vector3d target, float step) {
+        return lengthdir(origin, angle(origin, target), step);
+    }
+
+    /** (3D) NOTE: MAYBE BROKEN???
+     *  Returns the angle such that calling lengthdir(origin, angle.x, angle.y, distance(origin, target))
+     *  returns the target point. 'x' = pitch, 'y' = yaw. <br><br>
+     *  (Alternatively, you can think of it as the angle used for commands like /teleport.)*/
+    @Deprecated
+    public static Vector3d angle(Vector3d origin, Vector3d target) {
+        float yaw = (float) Math.atan2(target.x - origin.x, target.z - origin.z);
+
+        double x_delta = origin.x-target.x;
+        double z_delta = origin.z-target.z;
+        double distance_horizontal = Math.sqrt((x_delta*x_delta) + (z_delta*z_delta));
+
+        float pitch = (float) Math.atan2(distance_horizontal, target.y - origin.y);
+
+        return new Vector3d(pitch, yaw, 0);
+    }
+
+    /** (3D) Returns a point which distance from 'origin' is 'step', where the angle between the
+     * point and 'origin' is 'angle'. */
+    public static Vector3d lengthdir(Vector3d origin, Vector3d angle, float step) {
+       return lengthdir(origin, (float) angle.x, (float) angle.y, step);
+    }
+
+    /** (3D) Returns a point which distance from 'origin' is 'step', where the angle between the
+     * point and 'origin' is defined by 'pitch' and 'yaw'. */
+    public static Vector3d lengthdir(Vector3d origin, float pitch, float yaw, float step) {
+        double x_offset = Math.sin(yaw) * step;
+        double z_offset = Math.cos(yaw) * step;
+        double y_offset = Math.cos(pitch) * step;
+        return new Vector3d(origin.x + x_offset, origin.y + y_offset, origin.z + z_offset);
+    }
+    
 }

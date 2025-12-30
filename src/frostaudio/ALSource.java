@@ -46,7 +46,7 @@ public class ALSource {
 	private int 	sample_rate			= 44100;							 // Samples per second
 
 	private int 	buffer_count 		= 8;								 // The number of buffers to cycle between
-	private int 	buffer_amt 			= ((int) ( 44.1 * 40) ) * channels; // The number of PCM samples to buffer at once.
+	private int 	buffer_amt 			= ((int) ( 44.1 * 400) ) * channels; // The number of PCM samples to buffer at once.
 
 	protected int 	next_sample 		= 0; 	// The index of the sample after the last buffered sample
 	protected int 	last_sample 		= 0;	// The index of the end of the samples that have been buffered and played
@@ -82,6 +82,9 @@ public class ALSource {
 	}
 	
 	// -- == getters == -- //
+	
+	public int 	buffferCount	 () { return buffer_count; }
+	public int 	bufferFrameAmtMS () { return (int) samplestoMs(buffer_amt); }
 
 	public boolean ALstopped() { return alGetSourcei(source, AL_SOURCE_STATE) == AL_STOPPED; }
 	
@@ -92,8 +95,8 @@ public class ALSource {
 	public int  currentTimeSamples() { return last_sample + (alGetSourcei(source, AL11.AL_SAMPLE_OFFSET) * channels); }
 	public long currentTimeMillis () { return samplestoMs(currentTimeSamples()); }
 	
-	public float lastBufferTimeMillis() { return samplestoMs(last_sample); }
-	public float nextBufferTimeMillis() { return samplestoMs(next_sample); }
+	public long lastBufferTimeMillis() { return samplestoMs(last_sample); }
+	public long nextBufferTimeMillis() { return samplestoMs(next_sample); }
 
 	public int 	sampleCount 	  () { return data.length; }
 	public int 	frameCount 	  	  () { return data.length / channels; }
@@ -194,6 +197,7 @@ public class ALSource {
 		// Buffer the initial audio for this source.
 		if (ALstopped() || !playing) {
 			reset(); // make sure the source is empty
+			last_sample = next_sample;
 			for (int buffer : buffers) { bufferAudio(buffer); }
 		}
 		alSourcePlay(source); 
@@ -236,8 +240,9 @@ public class ALSource {
 	 *  the audio source. It should be called as often as possible to minimize
 	 *  audio cuts. If calling this method often isn't possible, try increasing 
 	 *  the buffer size and/or amount instead. */
-	public void update() { while (update_internal() > 0); }
-	
+	//public void update() { while (update_internal() > 0); }
+	public void update() { update_internal(); }
+
 	/** 'next_sample' needs to check and be set to 0 for looping after every call to bufferAudio(). 
 	 * I don't feel like wrapping this in a while loop and having ugly indentation, so I split the method instead... */
 	private int update_internal() {

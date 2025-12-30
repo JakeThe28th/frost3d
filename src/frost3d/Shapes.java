@@ -1,6 +1,7 @@
 package frost3d;
 
 import org.joml.Matrix4f;
+import org.joml.Vector3d;
 
 import frost3d.implementations.SimpleMesh;
 import frost3d.implementations.SimpleTexture;
@@ -90,6 +91,16 @@ public class Shapes {
 	public static void dot(F3DCanvas canvas, int x, int y, int z, int radius) {
 		Matrix4f transform = new Matrix4f().translate(x, y, z).scale(radius);
 		canvas.queue(unit_dot, transform, white);
+	}
+
+	public static void line(F3DCanvas canvas, int x1, int y1, int x2, int y2, int depth, int width) {
+		float distance = Utility.distance(new Vector3d(x1, y1, 0), new Vector3d(x2, y2, 0));
+		Matrix4f transform = new Matrix4f()
+				.translate(x1, y1, depth)
+				.rotateXYZ(0, 0, (float) Utility.angle2d(x2, y1, x1, y2))
+				.translate(-width/2, 0, 0) // center
+				.scale(width, distance, 1);
+		canvas.queue(unit_square, transform, white);
 	}
 
 }
