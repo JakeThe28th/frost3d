@@ -31,7 +31,7 @@ import org.lwjgl.openal.SOFTDirectChannels;
 import frost3d.utility.Log;
 import frostaudio.io.pcm.AudioFile;
 
-public class ALSource {
+public class AudioSource {
 	
 	static final int GLOBAL_SOURCE_LIMIT = 127;
 	static 		 int global_source_count = 0;
@@ -112,9 +112,9 @@ public class ALSource {
 	short	[] data    = new short	[0]; 				// Samples array
 	int		[] buffers = new int	[buffer_count]; 	// Available buffers
 	
-	public ALSource() {
-		if (ALSource.global_source_count < GLOBAL_SOURCE_LIMIT) {
-			ALSource.global_source_count ++;
+	public AudioSource() {
+		if (AudioSource.global_source_count < GLOBAL_SOURCE_LIMIT) {
+			AudioSource.global_source_count ++;
 			this.source = alGenSources();
 			generateBuffers();
 		} else {
@@ -134,7 +134,7 @@ public class ALSource {
 	/** Deletes the buffers and source object associated with this ALSource.<br>
 	 *  The effect of any method calls after this are undefined. It will probably just crash. */
 	public void free() {
-		ALSource.global_source_count --;
+		AudioSource.global_source_count --;
 		alDeleteSources(source);
 		freeBuffers();
 	}

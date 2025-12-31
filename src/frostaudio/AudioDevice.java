@@ -41,9 +41,9 @@ import frost3d.utility.Log;
 // For Future Reference,
 // https://github.com/LWJGL/lwjgl3/blob/master/modules/samples/src/test/java/org/lwjgl/demo/openal/ALCDemo.java
 
-public class ALDevice {
+public class AudioDevice {
 	
-	static ALDevice current_device;
+	static AudioDevice current_device;
 	
 	public static void printInfo() {
 		if (current_device == null) {
@@ -77,10 +77,10 @@ public class ALDevice {
 	public static float 		volume() 		{ return alGetListenerf(AL_GAIN); }
 	
 	/** I just think this is prettier than the constructor. So, you HAVE to use it!!! */
-	public static ALDevice	device(String device_name) { return new ALDevice(device_name); }
+	public static AudioDevice	device(String device_name) { return new AudioDevice(device_name); }
 	
 	/** I just think this is prettier than the constructor. So, you HAVE to use it!!! */
-	public static ALDevice	preffered() { return new ALDevice(null); }
+	public static AudioDevice	preffered() { return new AudioDevice(null); }
 	
 	// -- == Non-Static == -- //
 	
@@ -91,7 +91,7 @@ public class ALDevice {
 	
 	/** Creates and binds a device. <br>
 	 *  A null device name selects the default output device. */
-	private ALDevice(String device_name) {
+	private AudioDevice(String device_name) {
 		device = alcOpenDevice(device_name);
 		
 		if (device == NULL) { 

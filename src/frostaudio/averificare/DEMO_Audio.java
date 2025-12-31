@@ -15,8 +15,8 @@ import frost3d.implementations.SimpleTextRenderer;
 import frost3d.implementations.SimpleWindow;
 import frost3d.utility.Log;
 import frost3d.utility.Utility;
-import frostaudio.ALDevice;
-import frostaudio.ALSource;
+import frostaudio.AudioDevice;
+import frostaudio.AudioSource;
 import frostaudio.AudioMixer;
 import frostaudio.io.pcm.WAVFile;
 
@@ -41,9 +41,9 @@ public class DEMO_Audio {
 		 *  that the difference shown should be 0 if no bugs are
 		 *  present. */
 		
-		ALDevice default_device = ALDevice.preffered();
+		AudioDevice default_device = AudioDevice.preffered();
 		
-		ALDevice.printInfo();
+		AudioDevice.printInfo();
 
 		GLState.initializeGLFW();
 		SimpleWindow window = new SimpleWindow(256*5, 312, "DEMO_Mixer_Visual");
@@ -70,7 +70,7 @@ public class DEMO_Audio {
 	@Deprecated
 	private static void DEMO_Mixer_Visual(SimpleWindow window, SimpleCanvas canvas) throws IOException, UnsupportedAudioFileException {
 		AudioMixer mixer = new AudioMixer();
-		ALSource s = mixer.output();
+		AudioSource s = mixer.output();
 		//mixer.insert(song.getAs16BitPCM(), 1);
 		WAVFile song 	= new WAVFile("rgp_rain_short_nodrum.wav");
 		WAVFile kick 	= new WAVFile("k.wav");
@@ -105,15 +105,15 @@ public class DEMO_Audio {
 		}
 	}
 
-	private static void DEMO_Primary_Visual(ALDevice default_device, SimpleWindow window, SimpleCanvas canvas) throws IOException, UnsupportedAudioFileException {
-		ALSource s = new ALSource();
+	private static void DEMO_Primary_Visual(AudioDevice default_device, SimpleWindow window, SimpleCanvas canvas) throws IOException, UnsupportedAudioFileException {
+		AudioSource s = new AudioSource();
 		// s.addAudio(new WAVFile("rgp_rain_shortloop.wav"));
 		s.addAudio(new WAVFile("rgp_rain_short_nodrum.wav"));
 		s.loop(true);
 		s.volume(0.2f);
 
-		ALSource kick 	= new ALSource(); kick .addAudio(new WAVFile("k.wav"));
-		ALSource snare 	= new ALSource(); snare.addAudio(new WAVFile("s.wav"));
+		AudioSource kick 	= new AudioSource(); kick .addAudio(new WAVFile("k.wav"));
+		AudioSource snare 	= new AudioSource(); snare.addAudio(new WAVFile("s.wav"));
 		
 		int beat_time = (int) ((1f / (103f / 60f)) * 1000);
 		
@@ -160,7 +160,7 @@ public class DEMO_Audio {
 		return (time >= start && time < end);
 	}
 
-	private static void draw_audio_source(SimpleCanvas canvas, ALSource s, float scale, SimpleWindow window) {
+	private static void draw_audio_source(SimpleCanvas canvas, AudioSource s, float scale, SimpleWindow window) {
 		canvas.color(BLACK);
 		canvas.textrenderer().font_size(18);
 

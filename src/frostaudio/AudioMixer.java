@@ -17,11 +17,11 @@ public class AudioMixer {
 			data = new short[back_buffer_size + front_buffer_size];
 		}
 		
-		public AudioBuffer(ALSource mix) {
+		public AudioBuffer(AudioSource mix) {
 			buffersize(mix.msToSamples(3000), mix.msToSamples(3000));
 		}
 		
-		public void update(ALSource mix) {
+		public void update(AudioSource mix) {
 			mix.data = data;
 			
 			int old_sample = mix.next_sample;
@@ -57,13 +57,13 @@ public class AudioMixer {
 		}
 	}
 		
-	ALSource 	mix_output;
+	AudioSource 	mix_output;
 	AudioBuffer mix_buffer;
 
-	public ALSource output() { return mix_output; }
+	public AudioSource output() { return mix_output; }
 	
 	public AudioMixer() {
-		mix_output = new ALSource();
+		mix_output = new AudioSource();
 		mix_output.buffferCount(2);
 		mix_output.bufferFrameAmtMS(1000);
 		mix_output.auto_stop(false);
