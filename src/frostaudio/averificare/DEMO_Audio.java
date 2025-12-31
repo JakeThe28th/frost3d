@@ -1,7 +1,6 @@
 package frostaudio.averificare;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 
@@ -17,7 +16,6 @@ import frost3d.utility.Log;
 import frost3d.utility.Utility;
 import frostaudio.AudioDevice;
 import frostaudio.AudioSource;
-import frostaudio.AudioMixer;
 import frostaudio.io.pcm.WAVFile;
 
 public class DEMO_Audio {
@@ -40,6 +38,15 @@ public class DEMO_Audio {
 		 *  on screen. The important piece of information here is
 		 *  that the difference shown should be 0 if no bugs are
 		 *  present. */
+		
+		/*  NOTE: December 31st, 2025 
+		 *  I managed to get a working realtime-stable audio source
+		 *  working (AudioStreamedSource) by taking an entirely
+		 *  different approach to managing samples. I'm considering
+		 *  changing AudioSource to work using that system, but 
+		 *  I'm worried that managing multiple arraylists of shorts
+		 *  instead of just one short[] will have some performance
+		 *  ramifications, so I haven't fixed this yet. */
 		
 		AudioDevice default_device = AudioDevice.preffered();
 		
@@ -64,46 +71,6 @@ public class DEMO_Audio {
 	private static final Vector4f BLUE = new Vector4f(0,0,1,1);
 	private static final Vector4f PURPLE = new Vector4f(1,0,1,1);
 	private static final Vector4f YELLOW = new Vector4f(1,1,0,1);
-	record AEvent(long time, WAVFile event) {}
-
-	@SuppressWarnings({ "unchecked", "unused" })
-	@Deprecated
-	private static void DEMO_Mixer_Visual(SimpleWindow window, SimpleCanvas canvas) throws IOException, UnsupportedAudioFileException {
-		AudioMixer mixer = new AudioMixer();
-		AudioSource s = mixer.output();
-		//mixer.insert(song.getAs16BitPCM(), 1);
-		WAVFile song 	= new WAVFile("rgp_rain_short_nodrum.wav");
-		WAVFile kick 	= new WAVFile("k.wav");
-		WAVFile snare 	= new WAVFile("s.wav");
-		int  offset 		= 	    500;
-		long song_length 	= (int) s.samplestoMs(song.getAs16BitPCM().length);
-		int  beat_time 		= (int) ((1f / (103f / 60f)) * 1000);
-		ArrayList<AEvent> events = new ArrayList<>();
-		for (int i = 0; i < 4; i++) { events.add(new AEvent(offset + (song_length * i), song)); }
-		for (int i = 0; i < 60; i++) {
-			if ( i % 4 != 3) events.add(new AEvent(offset + (i * beat_time), kick));
-			if ( i % 4 == 3) events.add(new AEvent(offset + (i * beat_time), snare));
-		}
-		float scale = 1;
-		float target_scale = .2f;
-		mixer.play();
-		while (!window.should_close()) {
-			mixer.update();
-			for (AEvent event : (ArrayList<AEvent>) events.clone()) {
-				if (event.time < mixer.currentTimeMillis()) {
-					events.remove(event);
-					mixer.insert(event.event.getAs16BitPCM(), 1);
-				}
-			}
-			scale = (float) Utility.lerp(scale, target_scale, 0.25f);
-			if (window.input().keyPressed(GLFW.GLFW_KEY_MINUS)) target_scale /=2;
-			if (window.input().keyPressed(GLFW.GLFW_KEY_EQUAL)) target_scale *=2;
-			canvas.size(window.width, window.height);
-			draw_audio_source(canvas, mixer.output(), scale, window);
-			canvas.draw_frame();
-			window.tick();
-		}
-	}
 
 	private static void DEMO_Primary_Visual(AudioDevice default_device, SimpleWindow window, SimpleCanvas canvas) throws IOException, UnsupportedAudioFileException {
 		AudioSource s = new AudioSource();
