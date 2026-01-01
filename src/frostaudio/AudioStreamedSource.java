@@ -31,15 +31,13 @@ public class AudioStreamedSource {
 	
 	// -- OpenAL State -- //
 	private int source;
-	private int front_buffer;
-	private int back_buffer;
+	private int[] buffers = new int[2];
 	
 	public AudioStreamedSource() {
 		if (AudioSource.global_source_count < AudioSource.GLOBAL_SOURCE_LIMIT) {
 			AudioSource.global_source_count ++;
 			this.source = alGenSources();
-			this.front_buffer = alGenBuffers();
-			this.back_buffer = alGenBuffers();
+			for (int i = 0; i < buffers.length; i++) buffers[i] = alGenBuffers();
 			alSourcei(source, SOFTDirectChannels.AL_DIRECT_CHANNELS_SOFT, AL_TRUE); 
 		} else {
 			Log.send("Failed to create new audio source :: Too many");
@@ -49,8 +47,7 @@ public class AudioStreamedSource {
 	public void free() {
 		AudioSource.global_source_count --;
 		alDeleteSources(source);
-		alDeleteBuffers(front_buffer);
-		alDeleteBuffers(back_buffer);
+		for (int buffer : buffers) alDeleteBuffers(buffer);
 	}
 	
 	ArrayList<ArrayList<Short>> packets = new ArrayList<>();
@@ -82,11 +79,11 @@ public class AudioStreamedSource {
 		if (!playing) return;
 		if (ALstopped() || ALinitial()) {
 			alSourcei(source, AL_BUFFER, 0); // <-- without this, 'alSourcePlay' resets to the start of the old buffer
-			buffer(front_buffer);
-			buffer(back_buffer);
-			if (ALstopped() || ALinitial()) alSourcePlay(source); 
+			for (int buffer : buffers) buffer(buffer);
+			alSourcePlay(source); 
 		}	
-		if (alGetSourcei(source, AL_BUFFERS_PROCESSED) > 0) buffer(alSourceUnqueueBuffers(source));
+		int done = alGetSourcei(source, AL_BUFFERS_PROCESSED);
+		for (int j = 0; j < done; j++) buffer(alSourceUnqueueBuffers(source));
 	}
 	
 	private void buffer(int buffer) {
