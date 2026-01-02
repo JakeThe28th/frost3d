@@ -278,6 +278,11 @@ public class Utility {
 		return val;
 	}
 	
+	public static float clampf(float val, float min, float max) {
+		if (val < min) val = min;
+		if (val > max) val = max;
+		return val;
+	}
 	
 	public static float[] trim(float[] arr, int cout) {
 		float[] neww = new float[cout];
