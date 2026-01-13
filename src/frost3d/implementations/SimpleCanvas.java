@@ -96,7 +96,8 @@ public class SimpleCanvas implements F3DCanvas {
 		public void draw_frame() { draw_frame(true); }
 		public void draw_frame(boolean clear) {
 			// clear the framebuffer
-			if (framebuffer != null) framebuffer.bind();
+			if (framebuffer != null) 	framebuffer	.bind();
+			if (framebuffer == null) 	GLState.bindFramebuffer(0);
 			if (clear) GLState.clearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
 			if (clear) GLState.clear();
 			

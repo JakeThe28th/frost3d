@@ -3,6 +3,7 @@ import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 
+import frost3d.GLState;
 import frost3d.Input;
 import frost3d.interfaces.F3DWindow;
 
@@ -131,8 +132,7 @@ public class SimpleWindow implements F3DWindow {
 	
 	@Override public long identifier() { return window; }
 	@Override public void bind() {
-		// TODO Auto-generated method stub
-		GL40.glBindFramebuffer(GL40.GL_FRAMEBUFFER, 0);
+		GLState.bindFramebuffer(0);
 		viewport();
 	}
 	

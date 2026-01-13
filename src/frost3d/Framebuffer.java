@@ -8,7 +8,6 @@ import static org.lwjgl.opengl.GL30.GL_COLOR_ATTACHMENT0;
 import static org.lwjgl.opengl.GL30.GL_DEPTH_ATTACHMENT;
 import static org.lwjgl.opengl.GL30.GL_FRAMEBUFFER;
 import static org.lwjgl.opengl.GL30.GL_FRAMEBUFFER_COMPLETE;
-import static org.lwjgl.opengl.GL30.glBindFramebuffer;
 import static org.lwjgl.opengl.GL30.glCheckFramebufferStatus;
 import static org.lwjgl.opengl.GL30.glDeleteFramebuffers;
 import static org.lwjgl.opengl.GL30.glFramebufferTexture2D;
@@ -75,7 +74,7 @@ public class Framebuffer {
 	public int fbo() { return fbo; }
 	
 	public void bind() { 
-		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+		GLState.bindFramebuffer(fbo);
 		GL30.glViewport(0, 0, this.width(), this.height()); 
 	}
 	

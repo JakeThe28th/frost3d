@@ -11,6 +11,7 @@ import static org.lwjgl.opengl.GL11.glClearColor;
 import org.joml.Vector4f;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.opengl.GL40;
 
 public class GLState {
 
@@ -39,6 +40,15 @@ public class GLState {
 	public static void endGLFW() {
 		glfwTerminate();
 		glfwSetErrorCallback(null).free();
+	}
+	
+	public static int last_bound_framebuffer = 0;
+
+	public static void bindFramebuffer(int v) {
+		if (v != last_bound_framebuffer) {
+			GL40.glBindFramebuffer(GL40.GL_FRAMEBUFFER, v);
+			last_bound_framebuffer = v;
+		}
 	}
 	
 }
