@@ -1,5 +1,7 @@
 package frost3d.implementations;
 
+import static org.lwjgl.opengl.GL11.glViewport;
+
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 
@@ -96,8 +98,8 @@ public class SimpleCanvas implements F3DCanvas {
 		public void draw_frame() { draw_frame(true); }
 		public void draw_frame(boolean clear) {
 			// clear the framebuffer
-			if (framebuffer != null) 	framebuffer	.bind();
-			if (framebuffer == null) 	GLState.bindFramebuffer(0);
+			if (framebuffer != null) framebuffer.bind();
+			if (framebuffer == null && GLState.bindFramebuffer(0)) glViewport(0,0, width, height);
 			if (clear) GLState.clearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
 			if (clear) GLState.clear();
 			

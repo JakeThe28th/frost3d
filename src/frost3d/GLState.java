@@ -44,11 +44,13 @@ public class GLState {
 	
 	public static int last_bound_framebuffer = 0;
 
-	public static void bindFramebuffer(int v) {
+	public static boolean bindFramebuffer(int v) {
 		if (v != last_bound_framebuffer) {
 			GL40.glBindFramebuffer(GL40.GL_FRAMEBUFFER, v);
 			last_bound_framebuffer = v;
+			return true;
 		}
+		return false;
 	}
 	
 }
