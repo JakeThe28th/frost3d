@@ -36,7 +36,10 @@ public enum IconType {
 	GENERIC_SQUARE_OUTLINE		("hollow_square", 		"generic_square_outline"),
 	GENERIC_TRASH				("giant_trash", 		"generic_trash"),
 	GENERIC_VISIBILITY_OFF		("eye", 				"generic_visibility_off"),
-	GENERIC_VISIBILITY_ON		("eye", 				"generic_visibility_on");
+	GENERIC_VISIBILITY_ON		("eye", 				"generic_visibility_on"),
+	GENERIC_PAPER				("paper", 				"favorite_dinosaur"),
+	GENERIC_SAVE				("save", 				"favorite_dinosaur"),
+	GENERIC_LOAD				("load", 				"favorite_dinosaur");
 	public String vector; public String bitmap;
 	IconType(String vector, String bitmap) {
 		this.vector = vector; this.bitmap = bitmap;
