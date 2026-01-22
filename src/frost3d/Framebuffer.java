@@ -84,6 +84,13 @@ public class Framebuffer {
 		depth_texture.free(); 
 	}
 	
+	/** For some reason, 'glDeleteFramebuffers' is breaking 
+	 *  future framebuffers, so ... */
+	public void freetextures() { 
+		color_texture.free();
+		depth_texture.free(); 
+	}
+	
 	public int width() { return width; }
 	public int height() { return height; }
 

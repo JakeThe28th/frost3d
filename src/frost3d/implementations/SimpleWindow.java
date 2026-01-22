@@ -132,6 +132,7 @@ public class SimpleWindow implements F3DWindow {
 	
 	@Override public long identifier() { return window; }
 	@Override public void bind() {
+		glfwMakeContextCurrent(window);
 		GLState.bindFramebuffer(0);
 		viewport();
 	}
@@ -161,6 +162,7 @@ public class SimpleWindow implements F3DWindow {
 			GLFW.glfwSetWindowAttrib(identifier(), GLFW_DECORATED, GLFW_FALSE);
 		}
 	}
+	
 	public void center() {
 		// Get the thread stack and push a new frame
 		try ( MemoryStack stack = stackPush() ) {
@@ -181,5 +183,11 @@ public class SimpleWindow implements F3DWindow {
 			);
 		} // the stack frame is popped automatically
 	}
+	
+	public void position(int x, int y) {
+		glfwSetWindowPos( window, x, y );
+	}
+	
+	
 
 }

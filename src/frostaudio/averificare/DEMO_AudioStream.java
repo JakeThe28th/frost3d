@@ -41,7 +41,7 @@ public class DEMO_AudioStream {
 	
 	record AEvent(long time, WAVFile event) {}
 
-	@SuppressWarnings({ "unchecked", "unused" })
+	@SuppressWarnings({ "unchecked" })
 	private static void DEMO_Mixer_Visual(SimpleWindow window, SimpleCanvas canvas) throws IOException, UnsupportedAudioFileException {
 		AudioStreamedSource stream = new AudioStreamedSource();
 		//mixer.insert(song.getAs16BitPCM(), 1);
