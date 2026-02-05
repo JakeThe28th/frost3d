@@ -83,6 +83,7 @@ public class AudioSource {
 	
 	// -- == getters == -- //
 	
+	public int 	channels		 () { return channels; }
 	public int 	buffferCount	 () { return buffer_count; }
 	public int 	bufferFrameAmtMS () { return (int) samplestoMs(buffer_amt); }
 
@@ -160,7 +161,7 @@ public class AudioSource {
 	/** Add audio to the end of the samples array from an audio file; <br>
 	 * stereo, 44100hz, 16 bit signed 
 	 * @throws IOException */
-	public void addAudio(AudioFile file) throws IOException {
+	public void addAudio(AudioFile file) {
 			this.channels = file.channels();
 			if (channels >= 2) directChannels(true);
 			addAudio(file.getAs16BitPCM());
@@ -175,6 +176,10 @@ public class AudioSource {
 	 * The 'next_sample' variable is updated as needed. */
 	public void removeAudio(int start, int end) { Log.send("Unimplemented method :: ALSource.removeAudio");}
 	
+	public void removeAllAudio() { 
+		data = new short[0];
+	}
+
 	
 	// -- {{ ==      ................................................................................    == }} -- //
 	
