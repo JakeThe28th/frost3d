@@ -188,6 +188,10 @@ public class SimpleWindow implements F3DWindow {
 		glfwSetWindowPos( window, x, y );
 	}
 	
+	public void size(int w, int h) {
+		glfwSetWindowSize(window, w, h);
+	}
+	
 	
 
 }
