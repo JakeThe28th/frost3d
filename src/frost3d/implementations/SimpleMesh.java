@@ -12,6 +12,7 @@ import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
+import org.joml.Vector4f;
 import org.lwjgl.opengl.GL40;
 
 import frost3d.interfaces.GLMesh;
@@ -45,6 +46,20 @@ public class SimpleMesh implements GLMesh {
 		
 		count = indices.length;
 		
+		glBindVertexArray(0);
+	}
+	
+	public void setColors(Vector4f[] colors) {
+		bind();
+		if (cbo != -1) GL40.glDeleteBuffers(cbo);
+		float[] floats = new float[colors.length*4];
+		for (int i = 0; i < colors.length; i++) {
+			floats[0 + (i*4)] = colors[i].x;
+			floats[1 + (i*4)] = colors[i].y;
+			floats[2 + (i*4)] = colors[i].z;
+			floats[3 + (i*4)] = colors[i].w;
+		}
+		bufferFloats(floats, 2, 4);
 		glBindVertexArray(0);
 	}
 	

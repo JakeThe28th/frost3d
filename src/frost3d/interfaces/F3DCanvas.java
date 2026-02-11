@@ -31,6 +31,12 @@ public interface F3DCanvas {
 	/** Reverts to the previous scissor box. */
 	public void pop_scissor();
 	
+	/** Saves the current shader and then sets the new shader to this. */
+	public void push_shader(GLShaderProgram shader) ;
+	
+	/** Reverts to the previous shader. */
+	public void pop_shader();
+	
 	/** Sets the current color to this */
 	public void color(Vector4f color);
 	

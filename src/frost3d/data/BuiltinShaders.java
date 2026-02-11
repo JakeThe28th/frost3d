@@ -9,6 +9,7 @@ public class BuiltinShaders {
 	public static GLShaderProgram SCREEN;
 	public static GLShaderProgram GUI;
 	public static GLShaderProgram MONOCOLORED_TEXTURED_UNSHADED;
+	public static GLShaderProgram COLORED_TEXTURED_UNSHADED;
 
 	public static void init() {
 		try {
@@ -130,6 +131,37 @@ public class BuiltinShaders {
 						FragColor = texColor;
 					}
 	 			""");
+	 	
+	 	COLORED_TEXTURED_UNSHADED = new GLShaderProgram("""
+				#version 330 core
+				layout (location = 0) in vec3 v_position;
+				layout (location = 1) in vec2 v_texcoord;
+				layout (location = 2) in vec4 v_color;
+
+				uniform mat4 world_transform;	
+				uniform mat4 transform;											
+				out vec2 f_texcoord;
+				out vec4 f_color;
+
+				void main() {
+					f_texcoord = v_texcoord;
+	 				f_color = v_color;
+				    gl_Position = world_transform * transform * vec4(v_position, 1.0);
+				}
+			""", """
+				#version 330 core
+				out vec4 FragColor;
+
+				uniform sampler2D texture_image;
+				in vec2 f_texcoord;
+				in vec4 f_color;
+				uniform vec4 mix_color;
+
+				void main() {
+					FragColor = (texture(texture_image, f_texcoord) * f_color) * mix_color;
+					if (FragColor.a < 0.001) discard;
+				} 
+			""");
 	 	
 		} catch (Exception e) {
 			Log.trace(e);

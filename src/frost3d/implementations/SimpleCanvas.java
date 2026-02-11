@@ -2,6 +2,8 @@ package frost3d.implementations;
 
 import static org.lwjgl.opengl.GL11.glViewport;
 
+import java.util.ArrayList;
+
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 
@@ -36,8 +38,6 @@ public class SimpleCanvas implements F3DCanvas {
 		int height 			= -1;
 		public int width() { return width; }
 		public int height() { return height; }
-
-		private GLShaderProgram current_shader = BuiltinShaders.MONOCOLORED_TEXTURED_UNSHADED;
 		
 		public void textrenderer(F3DTextRenderer v) { this.textrenderer = v; }
 		public F3DTextRenderer textrenderer() { return this.textrenderer; }
@@ -75,7 +75,6 @@ public class SimpleCanvas implements F3DCanvas {
 		/** Reverts to the previous scissor box. */
 		public void pop_scissor() {
 			renderqueue.pop_scissor(gui_bounds);
-
 		}
 		
 		public void push_scissor(int left, int top, int right, int bottom) {
@@ -88,6 +87,12 @@ public class SimpleCanvas implements F3DCanvas {
 		Matrix4f world_transform;
 
 		public void color(Vector4f color) { this.color = color; }
+		
+		ArrayList<GLShaderProgram> shader_queue = new ArrayList<>();
+		public void push_shader	(GLShaderProgram shader) { shader_queue.add(shader); }
+		public void pop_shader 	() 						 { shader_queue.removeLast(); }
+		
+		{ push_shader(BuiltinShaders.MONOCOLORED_TEXTURED_UNSHADED); }
 
 		public void world_transform(Matrix4f mat) {
 			world_transform = mat;
@@ -148,7 +153,7 @@ public class SimpleCanvas implements F3DCanvas {
 		
 		@Override
 		public void queue(GLMesh mesh, Matrix4f transform, GLTexture... textures) {
-			queue(mesh, transform, world_transform, current_shader, textures);
+			queue(mesh, transform, world_transform, shader_queue.getLast(), textures);
 		}
 		
 		@Override

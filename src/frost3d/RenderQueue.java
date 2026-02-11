@@ -136,6 +136,11 @@ public class RenderQueue {
 			if (last_shader == null || !last_shader.equals(state.shader)) {
 				state.shader.bind();
 				last_shader = state.shader;
+				// TODO: use pop/push instead of just clearing, 
+				// since it's persistent per shader
+				last_intuniforms = new HashMap<>();
+				last_vecuniforms = new HashMap<>();
+				last_matuniforms = new HashMap<>();
 			}
 			
 			for (String uniform : state.intuniforms.keySet()) {
