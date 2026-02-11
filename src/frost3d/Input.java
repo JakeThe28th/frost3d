@@ -46,7 +46,9 @@ public class Input {
 		}
 		
 		// Events
-		current_keys = new Key[1024];
+		
+		for (int i = 0; i < current_keys.length; i++) current_keys[i] = null;
+		
 		current_mouse_buttons = new MouseButton[8];
 		mouse_scroll_x = 0; mouse_scroll_y = 0;
 		changed_focus_state = false;

@@ -15,6 +15,7 @@ import static org.lwjgl.opengl.GL13.GL_TEXTURE3;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
@@ -50,28 +51,21 @@ public class RenderQueue {
 	public void pop_scissor(Rectangle box) { scissors.pop(); }
 
 	public void uniform(String name, int v) {
-		intuniforms = new HashMap<String, Integer>(intuniforms);
 		intuniforms.put(name, v);
 	}
 	
 	public void uniform(String name, Vector4f v) {
-		vecuniforms = new HashMap<String, Vector4f>(vecuniforms);
+		if (vecuniforms.get(name) == v) return;
 		vecuniforms.put(name, v);
 	}
 	
 	public void uniform(String name, Matrix4f v) {
-		matuniforms = new HashMap<String, Matrix4f>(matuniforms);
 		matuniforms.put(name, v);
 	}
 	
 	public void clear_uniform(String name) {
-		intuniforms = new HashMap<String, Integer>(intuniforms);
 		intuniforms.remove(name);
-		
-		vecuniforms = new HashMap<String, Vector4f>(vecuniforms);
 		vecuniforms.remove(name);
-		
-		matuniforms = new HashMap<String, Matrix4f>(matuniforms);
 		matuniforms.remove(name);
 	}
 	
@@ -94,9 +88,9 @@ public class RenderQueue {
 	
 	
 	private static record RenderState(
-			HashMap<String, Integer> 	intuniforms,
-			HashMap<String, Vector4f> 	vecuniforms,
-			HashMap<String, Matrix4f> 	matuniforms,
+			Map<String, Integer> 	intuniforms,
+			Map<String, Vector4f> 	vecuniforms,
+			Map<String, Matrix4f> 	matuniforms,
 			Rectangle 		scissor,
 			GLMesh 			mesh,
 			GLTexture[] 	textures,
@@ -107,7 +101,7 @@ public class RenderQueue {
 	
 	public void queue() {
 		if (shader == null) throw new Error("Default shader is null. Did a RenderQueue method get called before BuiltinShaders.init()?");
-		queue.add(new RenderState(intuniforms, vecuniforms, matuniforms, scissors.peek(), mesh, textures, shader));
+		queue.add(new RenderState(Map.copyOf(intuniforms), Map.copyOf(vecuniforms), Map.copyOf(matuniforms), scissors.peek(), mesh, textures, shader));
 	}
 	
 	// -- ++ (  actual rendering  ) ++ -- //
@@ -117,9 +111,9 @@ public class RenderQueue {
 	Rectangle last_scissor = null;
 	GLShaderProgram last_shader = null;
 	
-	HashMap<String, Integer> 	last_intuniforms;
-	HashMap<String, Vector4f> 	last_vecuniforms;
-	HashMap<String, Matrix4f> 	last_matuniforms;
+	Map<String, Integer> 	last_intuniforms;
+	Map<String, Vector4f> 	last_vecuniforms;
+	Map<String, Matrix4f> 	last_matuniforms;
 	
 	public void render() {
 		last_mesh = null;
