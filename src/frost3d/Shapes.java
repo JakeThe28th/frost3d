@@ -102,5 +102,15 @@ public class Shapes {
 				.scale(width, distance, 1);
 		canvas.queue(unit_square, transform, white);
 	}
+	
+	public static Matrix4f line_matrix(int x1, int y1, int x2, int y2, int depth, int width) {
+		float distance = Utility.distance(new Vector3d(x1, y1, 0), new Vector3d(x2, y2, 0));
+		Matrix4f transform = new Matrix4f()
+				.translate(x1, y1, depth)
+				.rotateXYZ(0, 0, (float) Utility.angle2d(x2, y1, x1, y2))
+				.translate(-width/2, 0, 0) // center
+				.scale(width, distance, 1);
+		return transform;
+	}
 
 }
