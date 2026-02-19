@@ -101,4 +101,21 @@ public record Rectangle(int left, int top, int right, int bottom) {
 
 	}
 
+	/** Fixes a rectangle so that its' left and top are always less than its' right and bottom coordinates. */
+	public Rectangle fix() {
+		int n_left 		= left;
+		int n_top 		= top;
+		int n_right 	= right;
+		int n_bottom 	= bottom;
+		if (left > right) {
+			n_left = right;
+			n_right = left;
+		}
+		if (top > bottom) {
+			n_top = bottom;
+			n_bottom = top;
+		}
+		return new Rectangle(n_left, n_top, n_right, n_bottom);
+	}
+
 }
