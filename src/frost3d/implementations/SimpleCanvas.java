@@ -13,13 +13,17 @@ import frost3d.GLState;
 import frost3d.RenderQueue;
 import frost3d.Shapes;
 import frost3d.data.BuiltinShaders;
+import frost3d.enums.Alignment;
+import frost3d.enums.FillMode;
 import frost3d.enums.IconType;
 import frost3d.interfaces.F3DCanvas;
 import frost3d.interfaces.F3DIconRenderer;
 import frost3d.interfaces.F3DTextRenderer;
 import frost3d.interfaces.GLMesh;
 import frost3d.interfaces.GLTexture;
+import frost3d.utility.FloatRectangle;
 import frost3d.utility.Rectangle;
+import frost3d.utility.Utility;
 
 public class SimpleCanvas implements F3DCanvas {
 	//turn this into generic canvas and make gui use ICanvas an interface
@@ -153,6 +157,8 @@ public class SimpleCanvas implements F3DCanvas {
 		
 		@Override
 		public void queue(GLMesh mesh, Matrix4f transform, GLTexture... textures) {
+			if (mesh == null) throw new Error();
+
 			queue(mesh, transform, world_transform, shader_queue.getLast(), textures);
 		}
 		
@@ -167,6 +173,9 @@ public class SimpleCanvas implements F3DCanvas {
 			// default
 			renderqueue.mix_color(color);
 			
+			if (mesh == null) throw new Error();
+			if (world_transform == null) throw new Error();
+
 			// specific
 			renderqueue.mesh(mesh);
 			renderqueue.transform(transform);
@@ -186,5 +195,23 @@ public class SimpleCanvas implements F3DCanvas {
 		}
 		
 		public int queue_size() { return renderqueue.size(); }
+		
+		/** Renders this canvas to another canvas. */
+		public void draw_self(F3DCanvas canvas, boolean flip, Alignment halign, Alignment valign, FillMode fillmode) {
+			if (framebuffer() == null) throw new Error();
+			
+			FloatRectangle normalized;
+			Rectangle draw_rectangle;
+			
+			normalized 		= Utility.getFittedRectangle( canvas.width(), canvas.height(), 
+														  this.width(), this.height(), 
+														  halign, valign, fillmode );
+			normalized 		= normalized.multiply(1, flip ? -1 : 1);
+			normalized 		= normalized.normalizeFrom_NegativeOneToOne_TO_ZeroToOne();
+			normalized 		= normalized.multiply(canvas.width(), canvas.height());
+			draw_rectangle 	= normalized.toIntegerRectangle();
+			
+			canvas.rect(draw_rectangle, 0, framebuffer().texture());
+		}
 	
 }
