@@ -174,7 +174,7 @@ public class AudioSource {
 	 * The byte at location '5' in the new array is what was at the location '11' in the old array.<br><br>
 	 * 
 	 * The 'next_sample' variable is updated as needed. */
-	public void removeAudio(int start, int end) { Log.send("Unimplemented method :: ALSource.removeAudio");}
+	// public void removeAudio(int start, int end) { Log.send("Unimplemented method :: ALSource.removeAudio");}
 	
 	public void removeAllAudio() { 
 		data = new short[0];
