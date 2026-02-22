@@ -32,15 +32,22 @@ public class SimpleTextRenderer implements F3DTextRenderer {
 		anti_aliasing_enabled = b;
 	}
 	
+	//String font_name = "NSimSun";
+	String font_name = "Consolas";
+	
+	public void font(String name) {
+		this.font_name = name;
+	}
+	
 	int font_size = 18;
 	//Font font = new Font("SansSerif", Font.PLAIN, font_size);
-	Font font = new Font("Consolas", Font.PLAIN, font_size);
+	Font font = new Font(font_name, Font.PLAIN, font_size);
 	
 	public void font_size(int new_size) {
 		if (font_size == new_size) return;
 		
 		this.font_size = new_size;
-		font = new Font("Consolas", Font.PLAIN, font_size);
+		font = new Font(font_name, Font.PLAIN, font_size);
 	}
 	
 	HashMap<Integer, TextureInfo> 	textures = new HashMap<Integer, TextureInfo>();
