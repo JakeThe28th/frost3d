@@ -33,6 +33,10 @@ public class SimpleTexture implements GLTexture {
 		this(ImageIO.read(new FileInputStream(filename)));
 	}
 	
+	public SimpleTexture(String filename, boolean nearest) throws FileNotFoundException, IOException {
+		this(ImageIO.read(new FileInputStream(filename)), nearest);
+	}
+	
 	public SimpleTexture(BufferedImage image) {
 		this(image, false);
 	}
