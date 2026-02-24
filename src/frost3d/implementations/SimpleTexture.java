@@ -97,6 +97,18 @@ public class SimpleTexture implements GLTexture {
 		texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	}
 
+	public void setTextureData(int width, int height, ByteBuffer data) {
+		bind();
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	
+	public void setTextureData(BufferedImage image) {
+		bind();
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.getWidth(), image.getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, toByteBuffer(bufferedImageToTextureData(image)));
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	
 	/** Why can't i just use ByteBuffer.wrap(data)? No one knows. */
 	private ByteBuffer toByteBuffer(byte[] data) {
 		ByteBuffer buffer = BufferUtils.createByteBuffer(data.length);
