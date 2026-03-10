@@ -24,6 +24,10 @@ public class Log {
 	}
 	
 	public static void send(String... strings) {
+		send(false, strings);
+	}
+	
+	public static void send(boolean error, String... strings) {
 		String logged_message = "";
 		String p = "";
 		
@@ -32,7 +36,11 @@ public class Log {
 			p = ", ";
 		}
 		
-		System.out.println(logged_message);
+		if (error) {
+			System.err.println(logged_message);
+		} else {
+			System.out.println(logged_message);
+		}
 		internal_log(logged_message);
 	}
 
