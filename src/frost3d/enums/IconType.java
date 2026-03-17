@@ -35,7 +35,7 @@ public enum IconType {
 	GENERIC_SETTINGS			("gear", 				"generic_settings"),
 	GENERIC_SQUARE_OUTLINE		("hollow_square", 		"generic_square_outline"),
 	GENERIC_TRASH				("giant_trash", 		"generic_trash"),
-	GENERIC_VISIBILITY_OFF		("eye", 				"generic_visibility_off"),
+	GENERIC_VISIBILITY_OFF		("eye_closed", 			"generic_visibility_off"),
 	GENERIC_VISIBILITY_ON		("eye", 				"generic_visibility_on"),
 	GENERIC_PAPER				("paper", 				"favorite_dinosaur"),
 	GENERIC_SAVE				("save", 				"favorite_dinosaur"),
