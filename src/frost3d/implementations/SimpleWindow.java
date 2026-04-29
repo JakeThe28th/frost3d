@@ -6,6 +6,7 @@ import org.lwjgl.system.*;
 import frost3d.GLState;
 import frost3d.Input;
 import frost3d.interfaces.F3DWindow;
+import frost3d.utility.SimpleWindowHint;
 
 import java.nio.*;
 
@@ -27,7 +28,6 @@ public class SimpleWindow implements F3DWindow {
 	private boolean 	should_close = false;
 	public boolean 		decorated 	 = true;
 
-	
 	public int width() { return width; }
 	public int height() { return height; }
 
@@ -49,6 +49,10 @@ public class SimpleWindow implements F3DWindow {
 	}
 	
 	public SimpleWindow(int w, int h, String title, boolean decorated, int anti_aliasing_samples) {
+		this(w, h, title, anti_aliasing_samples, new SimpleWindowHint(SimpleWindowHint.Keys.DECORATED, decorated));
+	}
+	
+	public SimpleWindow(int w, int h, String title, int anti_aliasing_samples, SimpleWindowHint... hints) {
 		
 		width = w;
 		height = h;
@@ -60,10 +64,17 @@ public class SimpleWindow implements F3DWindow {
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // the window will stay hidden after creation
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
 		
-		if (!decorated) {
-			glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
-			this.decorated = false;
+		for (SimpleWindowHint hint : hints) {
+			glfwWindowHint(hint.hint().hint_id(), hint.value() ? GLFW_TRUE : GLFW_FALSE);
+			
+			// i forgot why i have this field so i'll leave it for compatibility's sake
+			if (hint.hint() == SimpleWindowHint.Keys.DECORATED && !hint.value()) {
+				this.decorated = false;
+			}
+			
 		}
+		
+		
 		
 		if (anti_aliasing_samples > 1) {
 			glfwWindowHint(GLFW_SAMPLES, anti_aliasing_samples);
