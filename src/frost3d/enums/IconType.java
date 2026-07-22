@@ -43,7 +43,10 @@ public enum IconType {
 	GENERIC_CUBE				("rgp_tile", 			"favorite_dinosaur"),
 	GENERIC_ENTITY				("rgp_entity", 			"favorite_dinosaur"),
 	GENERIC_SCENERY				("rgp_procedure", 		"favorite_dinosaur"),
-	GENERIC_X					("x", 					"control_pin_cancel");
+	GENERIC_LOCK				("lock", 				"favorite_dinosaur"),
+	GENERIC_LOCK_OPEN			("lock_open",	 		"favorite_dinosaur"),
+	GENERIC_X					("x", 					"control_pin_cancel"),
+	SMALL_SQUARE_OUTLINE		("hollow_square_small", "favorite_dinosaur");
 
 	public String vector; public String bitmap;
 	IconType(String vector, String bitmap) {
