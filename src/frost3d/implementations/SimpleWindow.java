@@ -51,11 +51,17 @@ public class SimpleWindow implements F3DWindow {
 	public SimpleWindow(int w, int h, String title, boolean decorated, int anti_aliasing_samples) {
 		this(w, h, title, anti_aliasing_samples, new SimpleWindowHint(SimpleWindowHint.Keys.DECORATED, decorated));
 	}
-	
+
 	public SimpleWindow(int w, int h, String title, int anti_aliasing_samples, SimpleWindowHint... hints) {
+		this(w, h, title, anti_aliasing_samples, NULL, hints);
+	}
+	
+	public SimpleWindow(int w, int h, String title, int anti_aliasing_samples, long share_context, SimpleWindowHint... hints) {
 		
 		width = w;
 		height = h;
+		
+		boolean show = true;
 		
 		onWindowResize();
 		
@@ -72,6 +78,11 @@ public class SimpleWindow implements F3DWindow {
 				this.decorated = false;
 			}
 			
+			// to not override the user's choice later
+			if (hint.hint() == SimpleWindowHint.Keys.VISIBLE && !hint.value()) {
+				show = false;
+			}
+			
 		}
 		
 		
@@ -81,7 +92,7 @@ public class SimpleWindow implements F3DWindow {
 		}
 
 		// Create the window
-		window = glfwCreateWindow(w, h, title, NULL, NULL);
+		window = glfwCreateWindow(w, h, title, NULL, share_context);
 		if ( window == NULL )
 			throw new RuntimeException("Failed to create the GLFW window");
 
@@ -114,7 +125,7 @@ public class SimpleWindow implements F3DWindow {
 		glfwSwapInterval(1);
 
 		// Make the window visible
-		glfwShowWindow(window);
+		if (show) glfwShowWindow(window);
 		
 		// Set the clear color
 		glClearColor(0.20f, 0.0f, 0.0f, 0.0f);
