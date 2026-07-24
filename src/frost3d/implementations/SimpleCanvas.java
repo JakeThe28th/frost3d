@@ -112,7 +112,7 @@ public class SimpleCanvas implements F3DCanvas {
 			if (clear) GLState.clearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
 			if (clear) GLState.clear();
 			
-			renderqueue.render();			
+			renderqueue.render();		
 		}
 		
 		@Override public void 		uniform(String name, int 	  v) { renderqueue.uniform(name, v); }
@@ -199,7 +199,11 @@ public class SimpleCanvas implements F3DCanvas {
 		/** Renders this canvas to another canvas. */
 		public void draw_self(F3DCanvas canvas, boolean flip, Alignment halign, Alignment valign, FillMode fillmode) {
 			if (framebuffer() == null) throw new Error();
-			
+			Rectangle draw_rectangle = get_draw_rectangle(canvas, flip, halign, valign, fillmode);
+			canvas.rect(draw_rectangle, 0, framebuffer().texture());
+		}
+		
+		public Rectangle get_draw_rectangle(F3DCanvas canvas, boolean flip, Alignment halign, Alignment valign, FillMode fillmode) {
 			FloatRectangle normalized;
 			Rectangle draw_rectangle;
 			
@@ -211,7 +215,7 @@ public class SimpleCanvas implements F3DCanvas {
 			normalized 		= normalized.multiply(canvas.width(), canvas.height());
 			draw_rectangle 	= normalized.toIntegerRectangle();
 			
-			canvas.rect(draw_rectangle, 0, framebuffer().texture());
+			return draw_rectangle;
 		}
 	
 }
