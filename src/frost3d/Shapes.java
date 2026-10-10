@@ -24,24 +24,32 @@ public class Shapes {
 		return new SimpleTexture(new byte[] { (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF }, 1, 1);
 	}
 	
-	static SimpleMesh unit_square = new SimpleMesh(
-		new float[] {
-		1,  1, 0.0f,  // top right
-		1,  0, 0.0f,  // bottom right
-	    0,  0, 0.0f,  // bottom left
-	    0,  1, 0.0f   // top left 
-		},
-		new float[] {
-		1,1,
-		1,0,
-		0,0,
-		0,1},
-		new int[] {
-		    0, 1, 3,   // first triangles
-		    1, 2, 3    // second triangle
-		});
+	static SimpleMesh unit_square;
+	static SimpleMesh unit_dot;
 	
-	static SimpleMesh unit_dot = meshCircle(0, 0, 0, 0, 360, 20, 1f);
+	static { init(); }
+	
+	/** TODO : automatically handle storing different meshes when the context is changed */
+	public static void init() {
+		unit_square = new SimpleMesh(
+				new float[] {
+				1,  1, 0.0f,  // top right
+				1,  0, 0.0f,  // bottom right
+			    0,  0, 0.0f,  // bottom left
+			    0,  1, 0.0f   // top left 
+				},
+				new float[] {
+				1,1,
+				1,0,
+				0,0,
+				0,1},
+				new int[] {
+				    0, 1, 3,   // first triangles
+				    1, 2, 3    // second triangle
+				});
+		unit_dot = meshCircle(0, 0, 0, 0, 360, 20, 1f);
+		white = newWhiteTexture();
+	}
 			
 	public static SimpleMesh meshCircle(float x, float y, float z, double start_angle, double end_angle, int resolution, float length) {
 		
