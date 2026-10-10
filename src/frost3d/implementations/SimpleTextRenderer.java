@@ -36,6 +36,10 @@ public class SimpleTextRenderer implements F3DTextRenderer {
 	String font_name = "Consolas";
 	
 	public void font(String name) {
+		if (!this.font_name.equals(name)) {
+			for (TextureInfo t : textures.values()) t.gltexture().free();
+			textures.clear();
+		}
 		this.font_name = name;
 	}
 	
@@ -143,7 +147,7 @@ public class SimpleTextRenderer implements F3DTextRenderer {
 		return info.meshes.get(character);
 	}
 
-	private GLTexture texture() {
+	protected GLTexture texture() {
 		if (textures.get(font_size) == null) {
 			textures.put(font_size, new TextureInfo(font_size));
 		}
