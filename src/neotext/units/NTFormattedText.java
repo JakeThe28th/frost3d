@@ -3,8 +3,10 @@ package neotext.units;
 import org.joml.Vector4f;
 
 import frost3d.implementations.SimpleCanvas;
+import frost3d.utility.Log;
 import frost3d.utility.Rectangle;
 import neotext.fonts.NTFontRenderer;
+import neotext.fonts.NTSimpleFontRenderer;
 
 public final class NTFormattedText implements NTInlineTextUnit {
 	
@@ -21,28 +23,29 @@ public final class NTFormattedText implements NTInlineTextUnit {
 	Vector4f 	highlight_color = null;
 	Vector4f 	color 			= BLACK;
 	
-	int[] x_offsets = new int[0];
-	String contents = "";
-
-	private boolean should_recalculate_x_offsets;
+	public String contents = "";
 	
 	public NTFormattedText(String contents) {
 		set_contents(contents);
 	}
 	
+	public NTFormattedText(String contents, NTSimpleFontRenderer renderer) {
+		this(contents);
+		set_font(renderer);
+	}
+
 	private void set_contents(String contents) {
 		this.contents = contents;
-		should_recalculate_x_offsets = true;
 	}
 	
-	private void recalculate_x_offsets() {
-		this.x_offsets = new int[contents.length()];
-		int px = 0;
-		for (int p = 0; p < part_count(); p++) {
-			x_offsets[p] = px;
-			px += kerning(p);
-		}
-	}
+	public NTFormattedText bold				(boolean 	v) { bold 				= v; return this; }
+	public NTFormattedText italic			(boolean 	v) { italic 			= v; return this; }
+	public NTFormattedText strikethrough	(boolean 	v) { strikethrough 		= v; return this; }
+	public NTFormattedText underlined		(boolean 	v) { underlined 		= v; return this; }
+	public NTFormattedText color			(Vector4f 	v) { color 				= v; return this; }
+	public NTFormattedText highlight_color	(Vector4f 	v) { highlight_color 	= v; return this; }
+	
+	public NTFormattedText font_size		(int	 	v) { font_size 	= v; font.font_size(v); return this; }
 
 	/** Note: the font object passed here is retained */
 	public void set_font(NTFontRenderer font) {
@@ -53,32 +56,26 @@ public final class NTFormattedText implements NTInlineTextUnit {
 	}
 
 	@Override
-	public Rectangle size() {
-		return size(0, part_count());
-	}
-
-	@Override
-	public void render(SimpleCanvas canvas, int x, int y) {
-		render(0, part_count(), canvas, x, y);
-	}
-
-	@Override
-	public Rectangle size(int start, int end) {
-		if (should_recalculate_x_offsets) recalculate_x_offsets();
-		return new Rectangle(0,0,x_offsets[end]-x_offsets[start],font_size);
-	}
-
-	@Override
-	public void render(int start, int end, SimpleCanvas canvas, int x, int y) {
-		int px = x;
+	public NTPostRenderInfo render(int start, SimpleCanvas canvas, int x, int y, int wrap_width) {
+		int p = start;
+		int px = 0;
+		int height = font_size;
 		canvas.color(color);
-		for (int p = start; p < end; p++) {
+		//Log.send((px < wrap_width && p < part_count()) + "?");
+		while (p < part_count()) {
+			int k = kerning(p);
+						
+			if (px + k > wrap_width) break;
 			
-			font.render_character(contents.charAt(p), canvas, px, y, 0);
-			
-			px += kerning(p);
-			
+			if (bold) {
+				font.render_character(contents.charAt(p), canvas, x + px + 1, y, 0);
+			}
+			font.render_character(contents.charAt(p), canvas, x + px, y, 0);
+			px += k;
+			p  ++;
+			//Log.send((px < wrap_width && p < part_count()) + "? , " + p);
 		}
+		return new NTPostRenderInfo(p, px, height, p == part_count());
 	}
 
 	private int kerning(int p) {
@@ -95,12 +92,6 @@ public final class NTFormattedText implements NTInlineTextUnit {
 	@Override
 	public int part_count() {
 		return contents.length();
-	}
-
-	@Override
-	public int part_x_offset(int start) {
-		if (should_recalculate_x_offsets) recalculate_x_offsets();
-		return x_offsets[start];
 	}
 
 }
