@@ -10,6 +10,10 @@ import neotext.fonts.NTSimpleFontRenderer;
 
 public final class NTFormattedText implements NTInlineTextUnit {
 	
+	public static final boolean WRAP_ON_BREAKPOINTS = true;
+	public static final boolean FORCE_WRAP_ON_EDGE = true;
+	public static final boolean DEBUG_SHOW_WORD_BOUNDS = false;
+	
 	public static final Vector4f BLACK = new Vector4f(0,0,0,1);
 	
 	NTFontRenderer  font = null;
@@ -56,26 +60,81 @@ public final class NTFormattedText implements NTInlineTextUnit {
 	}
 
 	@Override
-	public NTPostRenderInfo render(int start, SimpleCanvas canvas, int x, int y, int wrap_width) {
+	public NTPostRenderInfo render(int start, SimpleCanvas canvas, int x, int y, int c_wrap_w, int t_wrap_w) {
 		int p = start;
 		int px = 0;
 		int height = font_size;
 		canvas.color(color);
 		//Log.send((px < wrap_width && p < part_count()) + "?");
-		while (p < part_count()) {
-			int k = kerning(p);
-						
-			if (px + k > wrap_width) break;
+		d: while (p < part_count()) {
 			
-			if (bold) {
-				font.render_character(contents.charAt(p), canvas, x + px + 1, y, 0);
+			// get width until next break point
+			int word_width = 0;
+			int next_break_char  = p;
+			while (next_break_char < part_count()) {
+				if (is_word_boundary(contents.charAt(next_break_char))) break;
+				word_width += kerning(p);
+				next_break_char  ++;
 			}
-			font.render_character(contents.charAt(p), canvas, x + px, y, 0);
-			px += k;
-			p  ++;
-			//Log.send((px < wrap_width && p < part_count()) + "? , " + p);
+			
+			// break the whole word if it's longer than the current remaining width, 
+			// but not if it's longer than the entire width (in that case, break per-character)
+			if (WRAP_ON_BREAKPOINTS && (px + word_width > c_wrap_w) && (word_width < t_wrap_w)) break d;
+			
+			// actually render section
+			
+			if (DEBUG_SHOW_WORD_BOUNDS) {
+				
+				canvas.color(new Vector4f(1,0,1,0.8f));
+				canvas.rect(x + px, y, x + px + word_width, y + 10, 0);
+				
+				canvas.color(new Vector4f(0.1f,0,0,0.8f));
+				if ((t_wrap_w-(px + word_width)) < 0) {
+					canvas.color(new Vector4f(0.6f,0,0,0.8f));
+				}
+				canvas.textrenderer().font_size(10);
+				canvas.text(x + px, y - 10, 0, "["+(t_wrap_w-(px + word_width))+"]");
+				
+				canvas.color(color);
+			
+			}
+
+			while (p <= next_break_char && p < part_count()) {
+				
+				int k = kerning(p);
+				
+				// return from function when over edge (to force a character wrap)
+				boolean break_later = false;
+				if (FORCE_WRAP_ON_EDGE && px + k > c_wrap_w) {
+					if (k > t_wrap_w) {
+						break_later = true;
+					} else {
+						break d;
+					}
+				}
+				
+				if (bold) font.render_character(contents.charAt(p), canvas, x + px + 1, y, 0);
+				font.render_character(contents.charAt(p), canvas, x + px, y, 0);
+				
+				px += k;
+				p  ++;
+				
+				if (break_later) break d;
+
+			}
+			
 		}
 		return new NTPostRenderInfo(p, px, height, p == part_count());
+	}
+
+	public boolean is_word_boundary(char c) {
+		return switch (c) {
+			case ' ': yield true;
+			case '-': yield true;
+			case '~': yield true;
+			case '+': yield true;
+			default: yield false;
+		};
 	}
 
 	private int kerning(int p) {
