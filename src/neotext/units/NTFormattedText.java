@@ -1,10 +1,13 @@
 package neotext.units;
 
+import java.util.ArrayList;
+
 import org.joml.Vector4f;
 
 import frost3d.implementations.SimpleCanvas;
 import frost3d.utility.Log;
 import frost3d.utility.Rectangle;
+import neotext.NTEditor.CharacterInfo;
 import neotext.fonts.NTFontRenderer;
 import neotext.fonts.NTSimpleFontRenderer;
 
@@ -13,7 +16,8 @@ public final class NTFormattedText implements NTInlineTextUnit {
 	public static final boolean WRAP_ON_BREAKPOINTS = true;
 	public static final boolean FORCE_WRAP_ON_EDGE = true;
 	public static final boolean DEBUG_SHOW_WORD_BOUNDS = false;
-	
+	public static final boolean SKIP_SPACE_IF_FIRST_CHAR = true;
+
 	public static final Vector4f BLACK = new Vector4f(0,0,0,1);
 	
 	NTFontRenderer  font = null;
@@ -65,8 +69,15 @@ public final class NTFormattedText implements NTInlineTextUnit {
 		int px = 0;
 		int height = font_size;
 		boolean newline = false;
+		ArrayList<CharacterInfo> infos = new ArrayList<>();
 		canvas.color(color);
 		//Log.send((px < wrap_width && p < part_count()) + "?");
+		
+		if (SKIP_SPACE_IF_FIRST_CHAR) {
+			if (p != 0 && !Character.isWhitespace(contents.charAt(p-1)))
+			if (contents.charAt(p) == ' ') p++;
+		}
+		
 		d: while (p < part_count()) {
 			
 			// get width until next break point
@@ -103,6 +114,7 @@ public final class NTFormattedText implements NTInlineTextUnit {
 			while (p <= next_break_char && p < part_count()) {
 				
 				if (contents.charAt(p) == '\n') {
+					infos.add(new CharacterInfo(new Rectangle(x+px, y, x+px+5, y+height), this, p));
 					p++;
 					newline = true;
 					break d;
@@ -123,6 +135,8 @@ public final class NTFormattedText implements NTInlineTextUnit {
 				if (bold) font.render_character(contents.charAt(p), canvas, x + px + 1, y, 0);
 				font.render_character(contents.charAt(p), canvas, x + px, y, 0);
 				
+				infos.add(new CharacterInfo(new Rectangle(x+px, y, x+px+k, y+height), this, p));
+				
 				px += k;
 				p  ++;
 				
@@ -131,7 +145,7 @@ public final class NTFormattedText implements NTInlineTextUnit {
 			}
 			
 		}
-		return new NTPostRenderInfo(p, px, height, p == part_count(), newline);
+		return new NTPostRenderInfo(p, px, height, p == part_count(), newline, infos);
 	}
 
 	public boolean is_word_boundary(char c) {
@@ -158,6 +172,11 @@ public final class NTFormattedText implements NTInlineTextUnit {
 	@Override
 	public int part_count() {
 		return contents.length();
+	}
+
+	@Override
+	public void insert(String string, int position) {
+		contents = contents.substring(0, position) + string + contents.substring(position, contents.length());
 	}
 
 }

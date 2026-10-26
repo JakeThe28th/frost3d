@@ -3,10 +3,14 @@ package neotext;
 import java.util.ArrayList;
 
 import org.joml.Vector4f;
+import org.lwjgl.glfw.GLFW;
 
 import frost3d.Framebuffer;
+import frost3d.Input;
 import frost3d.implementations.SimpleCanvas;
+import frost3d.utility.Log;
 import frost3d.utility.Rectangle;
+import frost3d.utility.Utility;
 import neotext.fonts.NTSimpleFontRenderer;
 import neotext.units.NTFormattedText;
 import neotext.units.NTInlineTextUnit;
@@ -15,6 +19,10 @@ import neotext.units.NTInlineTextUnit.NTPostRenderInfo;
 public class NTEditor {
 	
 	private static final Vector4f WHITE = new Vector4f(1,1,1,1);
+
+	private static final Vector4f CURSOR_COLOR = new Vector4f(Utility.fromHex("#0031f5"));
+	
+	static { CURSOR_COLOR.w = 0.7f; }
 
 	ArrayList<NTInlineTextUnit> editor_contents = new ArrayList<>();
 	
@@ -50,6 +58,11 @@ public class NTEditor {
 	int selection_start = 0;
 	int selection_end   = 0;
 	
+	CharacterInfo cursor_draw;
+	
+	public record CharacterInfo(Rectangle area, NTInlineTextUnit source, int source_char) {}
+	
+	ArrayList<CharacterInfo> on_screen_character_info = new ArrayList<CharacterInfo>();
 	
 	boolean should_rerender_frame = true;
 	SimpleCanvas editor_canvas;
@@ -59,10 +72,30 @@ public class NTEditor {
 		editor_canvas.adopt(new Framebuffer(400, 400));
 	}
 	
-	public void tickEditor() {
+	public void tickEditor(Input input) {
+		
+		int len = 0;
+		for (NTInlineTextUnit unit : editor_contents) len += unit.part_count();
+		
+		if (input(input, GLFW.GLFW_KEY_LEFT) && cursor_position > 0) cursor_position --;
+		if (input(input, GLFW.GLFW_KEY_RIGHT) && cursor_position < len) cursor_position ++;
+		
+		if (input.input_string() != "") {
+			insert(input.input_string());
+			cursor_position += input.input_string().length();
+			input.input_string("");
+		}
 		
 	}
 	
+	private void insert(String string) {
+		cursor_draw.source.insert(string, cursor_draw.source_char);
+	}
+
+	private boolean input(Input input, int key) {
+		return input.keyPressed(key) || input.keyRepeated(key);
+	}
+
 	public void drawEditor(Rectangle area, SimpleCanvas canvas) {
 		
 		if (area.width() != editor_canvas.width() || area.height() != editor_canvas.height()) {
@@ -74,11 +107,16 @@ public class NTEditor {
 		
 		if (should_rerender_frame) {
 			
+			cursor_draw = null;
+			
+			on_screen_character_info.clear();
+			int current_chara = 0;
+			
 			int xx = 0;
 			int yy = 0;
 			int max_height = 0;
 			for (NTInlineTextUnit unit : editor_contents) {
-				NTPostRenderInfo info = new NTPostRenderInfo(0,0,0,false,false);
+				NTPostRenderInfo info = new NTPostRenderInfo(0,0,0,false,false,null);
 				int unit_start = 0;
 				while (!info.end_of_unit()) {
 					info = unit.render(unit_start, editor_canvas, xx, yy, area.width()-xx, area.width());
@@ -90,7 +128,28 @@ public class NTEditor {
 					}
 					unit_start = info.next_character();
 					//Log.send(text_area.right()-xx + ", " + info.toString() + ", " + ((NTFormattedText) unit).contents );
+				
+					// TODO : handle offscreen for scrolling
+					// i'll probably skip the loop body when i implement that,
+					// so, i'm putting this line in here...
+					on_screen_character_info.addAll(info.infos());
+					
+					// scuffed check but it's midnight lol
+					if (cursor_draw == null && cursor_position >= current_chara && cursor_position < current_chara + unit_start) {
+						for (CharacterInfo c_info : info.infos()) {
+							if (current_chara + c_info.source_char == cursor_position) {
+								cursor_draw = c_info;
+							}
+						}
+					}
+					
 				}
+				current_chara += unit.part_count();
+			}
+			
+			if (cursor_draw != null) {
+				editor_canvas.color(CURSOR_COLOR);
+				editor_canvas.rect(cursor_draw.area, 0);
 			}
 			
 			editor_canvas.draw_frame();

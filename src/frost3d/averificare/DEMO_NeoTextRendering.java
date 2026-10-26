@@ -11,6 +11,7 @@ import frost3d.implementations.SimpleTextRenderer;
 import frost3d.implementations.SimpleWindow;
 import frost3d.utility.Log;
 import frost3d.utility.Rectangle;
+import neotext.NTEditor;
 import neotext.fonts.NTSimpleFontRenderer;
 import neotext.units.NTFormattedText;
 import neotext.units.NTInlineTextUnit;
@@ -49,7 +50,7 @@ public class DEMO_NeoTextRendering {
 									+ "  The Anonymous Yellow Lizard\r\n"
 									+ "* (You decide not to read it.)", new NTSimpleFontRenderer()).font_size(14),
 		};
-		
+				
 		Rectangle text_area = new Rectangle(30, 40, 450, 480);
 		
 		boolean dragging_left = false;
@@ -124,7 +125,7 @@ public class DEMO_NeoTextRendering {
 			int yy = text_area.top();
 			int max_height = 0;
 			for (NTInlineTextUnit unit : units) {
-				NTPostRenderInfo info = new NTPostRenderInfo(0,0,0,false,false);
+				NTPostRenderInfo info = new NTPostRenderInfo(0,0,0,false,false,null);
 				int unit_start = 0;
 				while (!info.end_of_unit()) {
 					info = unit.render(unit_start, canvas, xx, yy, text_area.right()-xx, text_area.width());

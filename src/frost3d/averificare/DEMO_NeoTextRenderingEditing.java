@@ -100,6 +100,7 @@ public class DEMO_NeoTextRenderingEditing {
 			canvas.color(new Vector4f(1f, 0.8f, 0.8f, 1f));
 			canvas.rect(text_area, 0);
 			
+			text_editor.tickEditor(window.input());
 			text_editor.drawEditor(text_area, canvas);
 			
 			canvas.color(NTFormattedText.BLACK);
