@@ -124,13 +124,13 @@ public class DEMO_NeoTextRendering {
 			int yy = text_area.top();
 			int max_height = 0;
 			for (NTInlineTextUnit unit : units) {
-				NTPostRenderInfo info = new NTPostRenderInfo(0,0,0,false);
+				NTPostRenderInfo info = new NTPostRenderInfo(0,0,0,false,false);
 				int unit_start = 0;
 				while (!info.end_of_unit()) {
 					info = unit.render(unit_start, canvas, xx, yy, text_area.right()-xx, text_area.width());
 					xx += info.width();
 					if (info.height() > max_height) max_height = info.height();
-					if ((info.width() == 0 && !info.end_of_unit()) || (xx > text_area.right())) {
+					if (info.newline() || (info.width() == 0 && !info.end_of_unit()) || (xx > text_area.right())) {
 						xx = text_area.left();
 						yy += max_height;
 					}

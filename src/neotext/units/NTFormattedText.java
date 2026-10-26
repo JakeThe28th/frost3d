@@ -64,6 +64,7 @@ public final class NTFormattedText implements NTInlineTextUnit {
 		int p = start;
 		int px = 0;
 		int height = font_size;
+		boolean newline = false;
 		canvas.color(color);
 		//Log.send((px < wrap_width && p < part_count()) + "?");
 		d: while (p < part_count()) {
@@ -101,6 +102,12 @@ public final class NTFormattedText implements NTInlineTextUnit {
 
 			while (p <= next_break_char && p < part_count()) {
 				
+				if (contents.charAt(p) == '\n') {
+					p++;
+					newline = true;
+					break d;
+				}
+				
 				int k = kerning(p);
 				
 				// return from function when over edge (to force a character wrap)
@@ -124,7 +131,7 @@ public final class NTFormattedText implements NTInlineTextUnit {
 			}
 			
 		}
-		return new NTPostRenderInfo(p, px, height, p == part_count());
+		return new NTPostRenderInfo(p, px, height, p == part_count(), newline);
 	}
 
 	public boolean is_word_boundary(char c) {
