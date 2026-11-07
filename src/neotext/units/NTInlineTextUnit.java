@@ -15,5 +15,6 @@ public sealed interface NTInlineTextUnit permits NTFormattedText {//, NTMath {
 	int part_count();
 
 	public void insert(String string, int position);
+	public void remove(int position);
 
 }

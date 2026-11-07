@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import org.joml.Vector4f;
 
 import frost3d.implementations.SimpleCanvas;
-import frost3d.utility.Log;
 import frost3d.utility.Rectangle;
 import neotext.NTEditor.CharacterInfo;
 import neotext.fonts.NTFontRenderer;
@@ -177,6 +176,11 @@ public final class NTFormattedText implements NTInlineTextUnit {
 	@Override
 	public void insert(String string, int position) {
 		contents = contents.substring(0, position) + string + contents.substring(position, contents.length());
+	}
+	
+	@Override
+	public void remove(int position) {
+		contents = contents.substring(0, position) + contents.substring(position + 1, contents.length());
 	}
 
 }
