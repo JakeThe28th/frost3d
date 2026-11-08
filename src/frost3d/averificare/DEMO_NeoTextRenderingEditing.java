@@ -1,5 +1,6 @@
 package frost3d.averificare;
 
+import org.joml.Vector2i;
 import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFW;
 
@@ -11,11 +12,9 @@ import frost3d.implementations.SimpleTextRenderer;
 import frost3d.implementations.SimpleWindow;
 import frost3d.utility.Log;
 import frost3d.utility.Rectangle;
-import neotext.NTEditor;
-import neotext.fonts.NTSimpleFontRenderer;
-import neotext.units.NTFormattedText;
-import neotext.units.NTInlineTextUnit;
-import neotext.units.NTInlineTextUnit.NTPostRenderInfo;
+import neotext.text.NTTextUnit;
+import neotext.layout.NTEditor;
+import neotext.text.NTSimpleFontRenderer;
 
 public class DEMO_NeoTextRenderingEditing {
 
@@ -100,10 +99,12 @@ public class DEMO_NeoTextRenderingEditing {
 			canvas.color(new Vector4f(1f, 0.8f, 0.8f, 1f));
 			canvas.rect(text_area, 0);
 			
-			text_editor.tickEditor(window.input());
-			text_editor.drawEditor(text_area, canvas);
+			text_editor.tick(window.input(), new Vector2i(window.input().mousePos()).sub(text_area.left(), text_area.top()));
+			text_editor.document.render(text_area, canvas);
+			text_editor.render(text_area, canvas);
+
 			
-			canvas.color(NTFormattedText.BLACK);
+			canvas.color(NTTextUnit.BLACK);
 			canvas.text(10, 10, 0, String.format("%.2f", (((System.nanoTime() - frame_start) / 10000) / 100d), args));
 			frame_start = System.nanoTime();
 			

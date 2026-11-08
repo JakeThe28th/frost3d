@@ -1,4 +1,4 @@
-package neotext.fonts;
+package neotext.text;
 
 import frost3d.implementations.SimpleTextRenderer;
 import frost3d.interfaces.F3DCanvas;
