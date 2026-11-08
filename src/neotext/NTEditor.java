@@ -189,7 +189,14 @@ public class NTEditor {
 		        	closest = info;
 		        }
 			}
-			setcursor(start(closest.source) + closest.source_char, shift); 
+			
+			setcursor(start(closest.source) + closest.source_char, true); 
+
+			if (input.mouseButtonPressed(GLFW.GLFW_MOUSE_BUTTON_LEFT)) {
+				select_start = cursor;
+				select_end = cursor;
+			}
+			
 		}
 		
 	}
@@ -262,8 +269,8 @@ public class NTEditor {
 		cursor = position;
 		if (cursor < 0) cursor = 0;
 		int len = content_length();	if (cursor > len) cursor = len;
-		if (!shift) select_start = cursor + 1;
-		select_end = cursor + 1;
+		if (!shift) select_start = cursor;
+		select_end = cursor;
 	}
 
 }
