@@ -18,7 +18,7 @@ public class NTDocument {
 	public record CharacterInfo(Rectangle area, NTTextUnit source, int source_char, int real_char) {}
 	
 	// --= Persistent State =-- //
-	ArrayList<NTTextUnit> 	document = new ArrayList<>();
+	ArrayList<NTTextUnit> 	document = new ArrayList<>(); // TODO : allow other types like images here
 	SimpleCanvas 			document_canvas;
 
 	// --= Temporary State =-- //
