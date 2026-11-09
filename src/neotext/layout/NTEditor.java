@@ -74,30 +74,42 @@ public class NTEditor {
 		if (input(input, GLFW.GLFW_KEY_HOME )) setcursor(0, shift, false); // TODO : home to last tab /or/ newline
 		if (input(input, GLFW.GLFW_KEY_END  )) setcursor(len-1, shift, false); // TODO : end to before next newline
 
-//		if (input(input, GLFW.GLFW_KEY_DOWN ) && cursor < len ) {
-//			
-//			// TODO : Make sure cursor and destination are on-screen
-//			
-//			for (CharacterInfo _cursor : document.rendered_characters) {
-//				if (_cursor.real_char() == cursor) {
-//					
-//					CharacterInfo closest = null;
-//					double closest_dist = -1;
-//					for (CharacterInfo info : document.rendered_characters) {
-//						Vector2i c = info.area().center();
-//						Vector2i c2 = _cursor.area().center();
-//				        double distance = Math.sqrt((Math.pow(c2.x - c.x, 2)) + (Math.pow(c2.y - c.y, 2)));
-//				        if (info.area().top() > _cursor.area().top() && (closest_dist < 0 || distance < closest_dist)) {
-//				        	closest_dist = distance;
-//				        	closest = info;
-//				        }
-//					}
-//					
-//					setcursor(closest.real_char(), shift, true);
-//					
-//				}	
-//			}
-//		}
+		class YNavigation {
+			// maybe a programming crime?
+			void navigate(boolean direction) {
+				// TODO : Make sure cursor and destination are on-screen
+				
+				Vector2i 		original 		= null;
+				
+				for (CharacterInfo _cursor : document.rendered_characters) {
+					if (_cursor.real_char() == cursor) original = _cursor.area().center();
+				}
+				
+				for (CharacterInfo _cursor : document.rendered_characters) {
+					if (_cursor.real_char() == cursor_for_y_navigation) original.x = _cursor.area().center().x;
+				}
+						
+				CharacterInfo 	closest 		= null;
+				double 			closest_dist 	= -1;
+
+				for (CharacterInfo info : document.rendered_characters) {
+					Vector2i target = info.area().center();
+			        double distance = distance(original, target);
+			        
+			        boolean condition = direction ? (target.y < original.y) : (target.y > original.y);
+			        
+			        if (condition && (closest_dist < 0 || distance < closest_dist)) {
+			        	closest_dist = distance;
+			        	closest = info;
+			        }
+				}
+				
+				if (closest != null) setcursor(closest.real_char(), shift, true);
+			}
+		}
+		
+		if (input(input, GLFW.GLFW_KEY_DOWN ) && cursor < len ) new YNavigation().navigate(false);
+		if (input(input, GLFW.GLFW_KEY_UP ) && cursor < len ) new YNavigation().navigate(true);
 
 		if (input(input, GLFW.GLFW_KEY_ENTER)) {
 			if (select_end() - select_start() > 0) {
@@ -147,7 +159,7 @@ public class NTEditor {
 			double closest_dist = -1;
 			for (CharacterInfo info : document.rendered_characters) {
 				Vector2i c = info.area().center();
-		        double distance = Math.sqrt((Math.pow(mp.x - c.x, 2)) + (Math.pow(mp.y - c.y, 2)));
+		        double distance = distance(mp, c);
 		        if (closest_dist < 0 || distance < closest_dist) {
 		        	closest_dist = distance;
 		        	closest = info;
@@ -194,6 +206,10 @@ public class NTEditor {
 		
 	}
 	
+	private double distance(Vector2i p1, Vector2i p2) {
+		return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
+	}
+
 	private String selected_string_plaintext() {
 		String str = "";
 		int index = 0;
