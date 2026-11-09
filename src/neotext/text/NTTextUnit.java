@@ -64,7 +64,7 @@ public final class NTTextUnit {
 	}
 
 	/** Renders characters until the wrap_width is achieved. */
-	public NTPostRenderInfo render(int document_index, int start, SimpleCanvas canvas, int x, int y, int c_wrap_w, int t_wrap_w) {
+	public NTPostRenderInfo render(int document_index, int start, SimpleCanvas canvas, int x, int y, int c_wrap_w, int t_wrap_w, int tab_size_px) {
 		int p = start;
 		int px = 0;
 		int height = font_size;
@@ -121,6 +121,11 @@ public final class NTTextUnit {
 				}
 				
 				int k = kerning(p);
+				
+				if (contents.charAt(p) == '\t') {
+					int next_indent = (int) (Math.ceil((x + px + 1) / (double) tab_size_px) * tab_size_px);
+					k = next_indent-(x + px);
+				}
 				
 				// return from function when over edge (to force a character wrap)
 				boolean break_later = false;

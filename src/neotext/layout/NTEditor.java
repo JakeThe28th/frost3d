@@ -6,7 +6,6 @@ import org.lwjgl.glfw.GLFW;
 
 import frost3d.Input;
 import frost3d.implementations.SimpleCanvas;
-import frost3d.utility.Log;
 import frost3d.utility.Rectangle;
 import neotext.text.NTTextUnit;
 import neotext.layout.NTDocument.CharacterInfo;
@@ -71,8 +70,8 @@ public class NTEditor {
 		if (input(input, GLFW.GLFW_KEY_LEFT  ) && cursor > 0   ) setcursor(cursor - 1, shift, false);
 		if (input(input, GLFW.GLFW_KEY_RIGHT ) && cursor < len ) setcursor(cursor + 1, shift, false);
 		
-		if (input(input, GLFW.GLFW_KEY_HOME )) setcursor(0, shift, false); // TODO : home to last tab /or/ newline
-		if (input(input, GLFW.GLFW_KEY_END  )) setcursor(len-1, shift, false); // TODO : end to before next newline
+		if (input(input, GLFW.GLFW_KEY_HOME )) setcursor(first_whitespace_of_line_before_cursor(), shift, false);
+		if (input(input, GLFW.GLFW_KEY_END  )) setcursor(last_char_of_line(), shift, false);
 
 		class YNavigation {
 			// maybe a programming crime?
@@ -185,6 +184,8 @@ public class NTEditor {
 			// TODO 
 		}
 		
+//			math
+		
 		if (input.keyDown(GLFW.GLFW_KEY_LEFT_CONTROL) && input(input, GLFW.GLFW_KEY_C)) {
 			Input.setClipboardString(selected_string_plaintext());
 		}
@@ -242,6 +243,54 @@ public class NTEditor {
 		int len = 0;
 		for (NTTextUnit unit : document.document) len += unit.character_count();
 		return len;
+	}
+	
+	int first_char_of_line() {
+		int current = 0;
+		int last_seen_newline = 0;
+		for (NTTextUnit unit : document.document) {
+			for (int i = 0; i < unit.character_count(); i++) {
+				if (current + i >= cursor) return last_seen_newline + 1;
+				if (unit.contents.charAt(i) == '\n') last_seen_newline = current + i;
+			}
+			current += unit.character_count();
+		}
+		
+		return 0;
+	}
+	
+	int last_char_of_line() {
+		int current = 0;
+		for (NTTextUnit unit : document.document) {
+			for (int i = 0; i < unit.character_count(); i++) {
+				if (current + i >= cursor && unit.contents.charAt(i) == '\n') return current + i;
+			}
+			current += unit.character_count();
+		}
+		
+		return 0;
+	}
+	
+	int first_whitespace_of_line() {
+		int start = first_char_of_line();
+		int current = 0;
+		int last_seen_whitespace = 0;
+		for (NTTextUnit unit : document.document) {
+			for (int i = 0; i < unit.character_count(); i++) {
+				boolean is_whitespace = Character.isWhitespace(unit.contents.charAt(i));
+				if (is_whitespace) last_seen_whitespace = current + i;
+				if (current + i >= start && !is_whitespace) return last_seen_whitespace + 1;
+			}
+			current += unit.character_count();
+		}
+		
+		return 0;
+	}
+	
+	int first_whitespace_of_line_before_cursor() {
+		int first_char_of_line 			= first_char_of_line();
+		int first_whitespace_of_line 	= first_whitespace_of_line();
+		return (cursor <= first_whitespace_of_line) ? first_char_of_line : first_whitespace_of_line;
 	}
 	
 	// TODO cursor blinking [copied from GUITextbox ]

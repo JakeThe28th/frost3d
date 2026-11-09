@@ -20,7 +20,9 @@ public class NTDocument {
 	// --= Persistent State =-- //
 	ArrayList<NTTextUnit> 	document = new ArrayList<>(); // TODO : allow other types like images here
 	SimpleCanvas 			document_canvas;
-
+	
+	int						tab_size_px = 40;
+	
 	// --= Temporary State =-- //
 	ArrayList<CharacterInfo> rendered_characters = new ArrayList<>();
 	boolean 				 should_rerender_frame = true;
@@ -78,7 +80,7 @@ public class NTDocument {
 				NTPostRenderInfo info = new NTPostRenderInfo(0,0,0,false,false,null);
 				int unit_start = 0;
 				while (!info.end_of_unit()) {
-					info = unit.render(current_chara, unit_start, document_canvas, xx, yy, area.width()-xx, area.width());
+					info = unit.render(current_chara, unit_start, document_canvas, xx, yy, area.width()-xx, area.width(), tab_size_px);
 					xx += info.width();
 					if (info.height() > max_height) max_height = info.height();
 					if (info.newline() || (info.width() == 0 && !info.end_of_unit()) || (xx > area.width())) {
